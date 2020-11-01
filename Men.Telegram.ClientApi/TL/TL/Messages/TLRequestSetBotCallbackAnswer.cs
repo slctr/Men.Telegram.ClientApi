@@ -42,14 +42,22 @@ namespace TeleSharp.TL.Messages
             this.Alert = (this.Flags & 2) != 0;
             this.QueryId = br.ReadInt64();
             if ((this.Flags & 1) != 0)
+            {
                 this.Message = StringUtil.Deserialize(br);
+            }
             else
+            {
                 this.Message = null;
+            }
 
             if ((this.Flags & 4) != 0)
+            {
                 this.Url = StringUtil.Deserialize(br);
+            }
             else
+            {
                 this.Url = null;
+            }
 
             this.CacheTime = br.ReadInt32();
 
@@ -63,9 +71,15 @@ namespace TeleSharp.TL.Messages
 
             bw.Write(this.QueryId);
             if ((this.Flags & 1) != 0)
+            {
                 StringUtil.Serialize(this.Message, bw);
+            }
+
             if ((this.Flags & 4) != 0)
+            {
                 StringUtil.Serialize(this.Url, bw);
+            }
+
             bw.Write(this.CacheTime);
 
         }

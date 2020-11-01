@@ -40,9 +40,13 @@ namespace TeleSharp.TL.Messages
             this.Bot = (TLAbsInputUser)ObjectUtils.DeserializeObject(br);
             this.Peer = (TLAbsInputPeer)ObjectUtils.DeserializeObject(br);
             if ((this.Flags & 1) != 0)
+            {
                 this.GeoPoint = (TLAbsInputGeoPoint)ObjectUtils.DeserializeObject(br);
+            }
             else
+            {
                 this.GeoPoint = null;
+            }
 
             this.Query = StringUtil.Deserialize(br);
             this.Offset = StringUtil.Deserialize(br);
@@ -57,7 +61,10 @@ namespace TeleSharp.TL.Messages
             ObjectUtils.SerializeObject(this.Bot, bw);
             ObjectUtils.SerializeObject(this.Peer, bw);
             if ((this.Flags & 1) != 0)
+            {
                 ObjectUtils.SerializeObject(this.GeoPoint, bw);
+            }
+
             StringUtil.Serialize(this.Query, bw);
             StringUtil.Serialize(this.Offset, bw);
 

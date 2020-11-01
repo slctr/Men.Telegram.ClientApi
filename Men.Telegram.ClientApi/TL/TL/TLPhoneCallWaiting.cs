@@ -45,11 +45,13 @@ namespace TeleSharp.TL
             this.ParticipantId = br.ReadInt32();
             this.Protocol = (TLPhoneCallProtocol)ObjectUtils.DeserializeObject(br);
             if ((this.Flags & 1) != 0)
+            {
                 this.ReceiveDate = br.ReadInt32();
+            }
             else
+            {
                 this.ReceiveDate = null;
-
-
+            }
         }
 
         public override void SerializeBody(BinaryWriter bw)
@@ -64,8 +66,9 @@ namespace TeleSharp.TL
             bw.Write(this.ParticipantId);
             ObjectUtils.SerializeObject(this.Protocol, bw);
             if ((this.Flags & 1) != 0)
+            {
                 bw.Write(this.ReceiveDate.Value);
-
+            }
         }
     }
 }

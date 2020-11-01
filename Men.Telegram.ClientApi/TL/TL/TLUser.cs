@@ -88,61 +88,103 @@ namespace TeleSharp.TL
             this.BotInlineGeo = (this.Flags & 2097152) != 0;
             this.Id = br.ReadInt32();
             if ((this.Flags & 1) != 0)
+            {
                 this.AccessHash = br.ReadInt64();
+            }
             else
+            {
                 this.AccessHash = null;
+            }
 
             if ((this.Flags & 2) != 0)
+            {
                 this.FirstName = StringUtil.Deserialize(br);
+            }
             else
+            {
                 this.FirstName = null;
+            }
 
             if ((this.Flags & 4) != 0)
+            {
                 this.LastName = StringUtil.Deserialize(br);
+            }
             else
+            {
                 this.LastName = null;
+            }
 
             if ((this.Flags & 8) != 0)
+            {
                 this.Username = StringUtil.Deserialize(br);
+            }
             else
+            {
                 this.Username = null;
+            }
 
             if ((this.Flags & 16) != 0)
+            {
                 this.Phone = StringUtil.Deserialize(br);
+            }
             else
+            {
                 this.Phone = null;
+            }
 
             if ((this.Flags & 32) != 0)
+            {
                 this.Photo = (TLAbsUserProfilePhoto)ObjectUtils.DeserializeObject(br);
+            }
             else
+            {
                 this.Photo = null;
+            }
 
             if ((this.Flags & 64) != 0)
+            {
                 this.Status = (TLAbsUserStatus)ObjectUtils.DeserializeObject(br);
+            }
             else
+            {
                 this.Status = null;
+            }
 
             if ((this.Flags & 16384) != 0)
+            {
                 this.BotInfoVersion = br.ReadInt32();
+            }
             else
+            {
                 this.BotInfoVersion = null;
+            }
 
             if ((this.Flags & 262144) != 0)
+            {
                 this.RestrictionReason = StringUtil.Deserialize(br);
+            }
             else
+            {
                 this.RestrictionReason = null;
+            }
 
             if ((this.Flags & 524288) != 0)
+            {
                 this.BotInlinePlaceholder = StringUtil.Deserialize(br);
+            }
             else
+            {
                 this.BotInlinePlaceholder = null;
+            }
 
             if ((this.Flags & 4194304) != 0)
+            {
                 this.LangCode = StringUtil.Deserialize(br);
+            }
             else
+            {
                 this.LangCode = null;
-
-
+            }
         }
 
         public override void SerializeBody(BinaryWriter bw)
@@ -163,28 +205,59 @@ namespace TeleSharp.TL
 
             bw.Write(this.Id);
             if ((this.Flags & 1) != 0)
+            {
                 bw.Write(this.AccessHash.Value);
-            if ((this.Flags & 2) != 0)
-                StringUtil.Serialize(this.FirstName, bw);
-            if ((this.Flags & 4) != 0)
-                StringUtil.Serialize(this.LastName, bw);
-            if ((this.Flags & 8) != 0)
-                StringUtil.Serialize(this.Username, bw);
-            if ((this.Flags & 16) != 0)
-                StringUtil.Serialize(this.Phone, bw);
-            if ((this.Flags & 32) != 0)
-                ObjectUtils.SerializeObject(this.Photo, bw);
-            if ((this.Flags & 64) != 0)
-                ObjectUtils.SerializeObject(this.Status, bw);
-            if ((this.Flags & 16384) != 0)
-                bw.Write(this.BotInfoVersion.Value);
-            if ((this.Flags & 262144) != 0)
-                StringUtil.Serialize(this.RestrictionReason, bw);
-            if ((this.Flags & 524288) != 0)
-                StringUtil.Serialize(this.BotInlinePlaceholder, bw);
-            if ((this.Flags & 4194304) != 0)
-                StringUtil.Serialize(this.LangCode, bw);
+            }
 
+            if ((this.Flags & 2) != 0)
+            {
+                StringUtil.Serialize(this.FirstName, bw);
+            }
+
+            if ((this.Flags & 4) != 0)
+            {
+                StringUtil.Serialize(this.LastName, bw);
+            }
+
+            if ((this.Flags & 8) != 0)
+            {
+                StringUtil.Serialize(this.Username, bw);
+            }
+
+            if ((this.Flags & 16) != 0)
+            {
+                StringUtil.Serialize(this.Phone, bw);
+            }
+
+            if ((this.Flags & 32) != 0)
+            {
+                ObjectUtils.SerializeObject(this.Photo, bw);
+            }
+
+            if ((this.Flags & 64) != 0)
+            {
+                ObjectUtils.SerializeObject(this.Status, bw);
+            }
+
+            if ((this.Flags & 16384) != 0)
+            {
+                bw.Write(this.BotInfoVersion.Value);
+            }
+
+            if ((this.Flags & 262144) != 0)
+            {
+                StringUtil.Serialize(this.RestrictionReason, bw);
+            }
+
+            if ((this.Flags & 524288) != 0)
+            {
+                StringUtil.Serialize(this.BotInlinePlaceholder, bw);
+            }
+
+            if ((this.Flags & 4194304) != 0)
+            {
+                StringUtil.Serialize(this.LangCode, bw);
+            }
         }
     }
 }

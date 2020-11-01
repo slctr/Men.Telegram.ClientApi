@@ -1,62 +1,84 @@
-﻿using Newtonsoft.Json;
+﻿using Men.Telegram.ClientApi.Generator.Models;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using TeleSharp.Generator.Models;
+using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace Men.Telegram.ClientApi.Generator
 {
     class Program
     {
-        static List<string> keywords = new List<string>(new string[] { "abstract", "as", "base", "bool", "break", "byte", "case", "catch", "char", "checked", "class", "const", "continue", "decimal", "default", "delegate", "do", "double", "else", "enum", "event", "explicit", "extern", "false", "finally", "fixed", "float", "for", "foreach", "goto", "if", "implicit", "in", "in", "int", "interface", "internal", "is", "lock", "long", "namespace", "new", "null", "object", "operator", "out", "out", "override", "params", "private", "protected", "public", "readonly", "ref", "return", "sbyte", "sealed", "short", "sizeof", "stackalloc", "static", "string", "struct", "switch", "this", "throw", "true", "try", "typeof", "uint", "ulong", "unchecked", "unsafe", "ushort", "using", "virtual", "void", "volatile", "while", "add", "alias", "ascending", "async", "await", "descending", "dynamic", "from", "get", "global", "group", "into", "join", "let", "orderby", "partial", "partial", "remove", "select", "set", "value", "var", "where", "where", "yield" });
-        static List<string> interfacesList = new List<string>();
-        static List<string> classesList = new List<string>();
+        private const string c_SchemaUrl = "https://core.telegram.org/schema/json";
+        private const string c_SchemaFileName = "schema.json";
+
+        private const string c_TypeThis = "himself";
+        private const string c_GeneratedNameSpace = "TeleSharp";
+
+        private static string FullSchemaFileName => $"{Directory.GetCurrentDirectory()}/{c_SchemaFileName}";
+
+        private static readonly List<string> keywords = new List<string>(new string[]
+        {
+            "abstract", "as", "base", "bool", "break", "byte", "case", "catch", "char",
+            "checked", "class", "const", "continue", "decimal", "default", "delegate",
+            "do", "double", "else", "enum", "event", "explicit", "extern", "false",
+            "finally", "fixed", "float", "for", "foreach", "goto", "if", "implicit",
+            "in", "int", "interface", "internal", "is", "lock", "long", "namespace",
+            "new", "null", "object", "operator", "out", "override", "params",
+            "private", "protected", "public", "readonly", "ref", "return", "sbyte",
+            "sealed", "short", "sizeof", "stackalloc", "static", "string", "struct",
+            "switch", "this", "throw", "true", "try", "typeof", "uint", "ulong",
+            "unchecked", "unsafe", "ushort", "using", "virtual", "void", "volatile",
+            "while", "add", "alias", "ascending", "async", "await", "descending", "dynamic",
+            "from", "get", "global", "group", "into", "join", "let", "orderby", "partial",
+            "remove", "select", "set", "value", "var", "where", "yield"
+        });
+
+        private static readonly List<string> interfacesList = new List<string>();
+        private static readonly List<string> classesList = new List<string>();
+
+
         static void Main(string[] args)
         {
+            Console.WriteLine("--- TL generator ---");
 
-            string AbsStyle = File.ReadAllText("ConstructorAbs.tmp");
-            string NormalStyle = File.ReadAllText("Constructor.tmp");
-            string MethodStyle = File.ReadAllText("Method.tmp");
+            string absCsTemplate = File.ReadAllText("Tempaltes/ConstructorAbs.cstemplate");
+            string normalCsTemplate = File.ReadAllText("Tempaltes/Constructor.cstemplate");
+            string methodCsTemplate = File.ReadAllText("Tempaltes/Method.cstemplate");
             //string method = File.ReadAllText("constructor.tt");
-            string Json = "";
 
-            string url;
-            if (!args.Any())
-                url = "json";
-            else
-                url = args[0];
+            string schemaJson = LoadSchema()
+                .GetAwaiter().GetResult();
+            TlSchema schema = JsonConvert.DeserializeObject<TlSchema>(schemaJson);
 
-            try
+            //FileStream file = File.OpenWrite("Result.cs");
+            //StreamWriter sw = new StreamWriter(file);
+
+            foreach (TlConstructor constructor in schema.Constructors)
             {
-                Json = File.ReadAllText(url);
+                interfacesList.Add(constructor.Type);
+                classesList.Add(constructor.Predicate);
             }
-            catch (FileNotFoundException ex)
+
+            foreach (TlConstructor constructor in schema.Constructors)
             {
-                throw new Exception("Couldn't find schema JSON file, did you download it first e.g. with `wget https://core.telegram.org/schema/json`?", ex);
-            }
-            FileStream file = File.OpenWrite("Result.cs");
-            StreamWriter sw = new StreamWriter(file);
-            TlSchema schema = JsonConvert.DeserializeObject<TlSchema>(Json);
-            foreach (var c in schema.Constructors)
-            {
-                interfacesList.Add(c.Type);
-                classesList.Add(c.Predicate);
-            }
-            foreach (var c in schema.Constructors)
-            {
-                var list = schema.Constructors.Where(x => x.Type == c.Type);
+                IEnumerable<TlConstructor> list = schema.Constructors.Where(x => x.Type == constructor.Type);
                 if (list.Count() > 1)
                 {
-                    string path = (GetNameSpace(c.Type).Replace("TeleSharp.TL", "TL\\").Replace(".", "") + "\\" + GetNameofClass(c.Type, true) + ".cs").Replace("\\\\", "\\");
+                    string path = (GetNameSpace(constructor.Type).Replace("TeleSharp.TL", "TL\\").Replace(".", "") + "\\" + GetNameofClass(constructor.Type, true) + ".cs").Replace("\\\\", "\\");
                     FileStream classFile = MakeFile(path);
                     using (StreamWriter writer = new StreamWriter(classFile))
                     {
-                        string nspace = GetNameSpace(c.Type).Replace("TeleSharp.TL", "TL\\").Replace(".", "").Replace("\\\\", "\\").Replace("\\", ".");
+                        string nspace = GetNameSpace(constructor.Type).Replace("TeleSharp.TL", "TL\\").Replace(".", "").Replace("\\\\", "\\").Replace("\\", ".");
                         if (nspace.EndsWith("."))
+                        {
                             nspace = nspace.Remove(nspace.Length - 1, 1);
-                        string temp = AbsStyle.Replace("/* NAMESPACE */", "TeleSharp." + nspace);
-                        temp = temp.Replace("/* NAME */", GetNameofClass(c.Type, true));
+                        }
+
+                        string temp = absCsTemplate.Replace("/* NAMESPACE */", "TeleSharp." + nspace);
+                        temp = temp.Replace("/* NAME */", GetNameofClass(constructor.Type, true));
                         writer.Write(temp);
                         writer.Close();
                         classFile.Close();
@@ -65,10 +87,11 @@ namespace Men.Telegram.ClientApi.Generator
                 else
                 {
                     interfacesList.Remove(list.First().Type);
-                    list.First().Type = "himself";
+                    list.First().Type = c_TypeThis;
                 }
             }
-            foreach (var c in schema.Constructors)
+
+            foreach (TlConstructor c in schema.Constructors)
             {
                 string path = (GetNameSpace(c.Predicate).Replace("TeleSharp.TL", "TL\\").Replace(".", "") + "\\" + GetNameofClass(c.Predicate, false) + ".cs").Replace("\\\\", "\\");
                 FileStream classFile = MakeFile(path);
@@ -77,26 +100,32 @@ namespace Men.Telegram.ClientApi.Generator
                     #region About Class
                     string nspace = GetNameSpace(c.Predicate).Replace("TeleSharp.TL", "TL\\").Replace(".", "").Replace("\\\\", "\\").Replace("\\", ".");
                     if (nspace.EndsWith("."))
+                    {
                         nspace = nspace.Remove(nspace.Length - 1, 1);
-                    string temp = NormalStyle.Replace("/* NAMESPACE */", "TeleSharp." + nspace);
-                    temp = c.Type == "himself" ? temp.Replace("/* PARENT */", "TLObject") : temp.Replace("/* PARENT */", GetNameofClass(c.Type, true));
+                    }
+
+                    string temp = normalCsTemplate.Replace("/* NAMESPACE */", "TeleSharp." + nspace);
+                    temp = c.Type == c_TypeThis ? temp.Replace("/* PARENT */", "TLObject") : temp.Replace("/* PARENT */", GetNameofClass(c.Type, true));
                     temp = temp.Replace("/*Constructor*/", c.Id.ToString());
                     temp = temp.Replace("/* NAME */", GetNameofClass(c.Predicate, false));
                     #endregion
                     #region Fields
                     string fields = "";
-                    foreach (var tmp in c.Params)
+                    foreach (TlParam tmp in c.Params)
                     {
                         fields += $"     public {CheckForFlagBase(tmp.Type, GetTypeName(tmp.Type))} {CheckForKeywordAndPascalCase(tmp.Name)} " + "{get;set;}" + Environment.NewLine;
                     }
                     temp = temp.Replace("/* PARAMS */", fields);
                     #endregion
                     #region ComputeFlagFunc
-                    if (!c.Params.Any(x => x.Name == "Flags")) temp = temp.Replace("/* COMPUTE */", "");
+                    if (!c.Params.Any(x => x.Name == "Flags"))
+                    {
+                        temp = temp.Replace("/* COMPUTE */", "");
+                    }
                     else
                     {
-                        var compute = "Flags = 0;" + Environment.NewLine;
-                        foreach (var param in c.Params.Where(x => IsFlagBase(x.Type)))
+                        string compute = "Flags = 0;" + Environment.NewLine;
+                        foreach (TlParam param in c.Params.Where(x => IsFlagBase(x.Type)))
                         {
                             if (IsTrueFlag(param.Type))
                             {
@@ -111,19 +140,23 @@ namespace Men.Telegram.ClientApi.Generator
                     }
                     #endregion
                     #region SerializeFunc
-                    var serialize = "";
+                    string serialize = "";
 
-                    if (c.Params.Any(x => x.Name == "Flags")) serialize += "ComputeFlags();" + Environment.NewLine + "bw.Write(Flags);" + Environment.NewLine;
-                    foreach (var p in c.Params.Where(x => x.Name != "Flags"))
+                    if (c.Params.Any(x => x.Name == "Flags"))
+                    {
+                        serialize += "ComputeFlags();" + Environment.NewLine + "bw.Write(Flags);" + Environment.NewLine;
+                    }
+
+                    foreach (TlParam p in c.Params.Where(x => x.Name != "Flags"))
                     {
                         serialize += WriteWriteCode(p) + Environment.NewLine;
                     }
                     temp = temp.Replace("/* SERIALIZE */", serialize);
                     #endregion
                     #region DeSerializeFunc
-                    var deserialize = "";
+                    string deserialize = "";
 
-                    foreach (var p in c.Params)
+                    foreach (TlParam p in c.Params)
                     {
                         deserialize += WriteReadCode(p) + Environment.NewLine;
                     }
@@ -134,7 +167,7 @@ namespace Men.Telegram.ClientApi.Generator
                     classFile.Close();
                 }
             }
-            foreach (var c in schema.Methods)
+            foreach (TlMethod c in schema.Methods)
             {
                 string path = (GetNameSpace(c.Method).Replace("TeleSharp.TL", "TL\\").Replace(".", "") + "\\" + GetNameofClass(c.Method, false, true) + ".cs").Replace("\\\\", "\\");
                 FileStream classFile = MakeFile(path);
@@ -143,15 +176,18 @@ namespace Men.Telegram.ClientApi.Generator
                     #region About Class
                     string nspace = GetNameSpace(c.Method).Replace("TeleSharp.TL", "TL\\").Replace(".", "").Replace("\\\\", "\\").Replace("\\", ".");
                     if (nspace.EndsWith("."))
+                    {
                         nspace = nspace.Remove(nspace.Length - 1, 1);
-                    string temp = MethodStyle.Replace("/* NAMESPACE */", "TeleSharp." + nspace);
+                    }
+
+                    string temp = methodCsTemplate.Replace("/* NAMESPACE */", "TeleSharp." + nspace);
                     temp = temp.Replace("/* PARENT */", "TLMethod");
                     temp = temp.Replace("/*Constructor*/", c.Id.ToString());
                     temp = temp.Replace("/* NAME */", GetNameofClass(c.Method, false, true));
                     #endregion
                     #region Fields
                     string fields = "";
-                    foreach (var tmp in c.Params)
+                    foreach (TlParam tmp in c.Params)
                     {
                         fields += $"        public {CheckForFlagBase(tmp.Type, GetTypeName(tmp.Type))} {CheckForKeywordAndPascalCase(tmp.Name)} " + "{get;set;}" + Environment.NewLine;
                     }
@@ -159,11 +195,14 @@ namespace Men.Telegram.ClientApi.Generator
                     temp = temp.Replace("/* PARAMS */", fields);
                     #endregion
                     #region ComputeFlagFunc
-                    if (!c.Params.Any(x => x.Name == "Flags")) temp = temp.Replace("/* COMPUTE */", "");
+                    if (!c.Params.Any(x => x.Name == "Flags"))
+                    {
+                        temp = temp.Replace("/* COMPUTE */", "");
+                    }
                     else
                     {
-                        var compute = "Flags = 0;" + Environment.NewLine;
-                        foreach (var param in c.Params.Where(x => IsFlagBase(x.Type)))
+                        string compute = "Flags = 0;" + Environment.NewLine;
+                        foreach (TlParam param in c.Params.Where(x => IsFlagBase(x.Type)))
                         {
                             if (IsTrueFlag(param.Type))
                             {
@@ -178,26 +217,30 @@ namespace Men.Telegram.ClientApi.Generator
                     }
                     #endregion
                     #region SerializeFunc
-                    var serialize = "";
+                    string serialize = "";
 
-                    if (c.Params.Any(x => x.Name == "Flags")) serialize += "ComputeFlags();" + Environment.NewLine + "bw.Write(Flags);" + Environment.NewLine;
-                    foreach (var p in c.Params.Where(x => x.Name != "Flags"))
+                    if (c.Params.Any(x => x.Name == "Flags"))
+                    {
+                        serialize += "ComputeFlags();" + Environment.NewLine + "bw.Write(Flags);" + Environment.NewLine;
+                    }
+
+                    foreach (TlParam p in c.Params.Where(x => x.Name != "Flags"))
                     {
                         serialize += WriteWriteCode(p) + Environment.NewLine;
                     }
                     temp = temp.Replace("/* SERIALIZE */", serialize);
                     #endregion
                     #region DeSerializeFunc
-                    var deserialize = "";
+                    string deserialize = "";
 
-                    foreach (var p in c.Params)
+                    foreach (TlParam p in c.Params)
                     {
                         deserialize += WriteReadCode(p) + Environment.NewLine;
                     }
                     temp = temp.Replace("/* DESERIALIZE */", deserialize);
                     #endregion
                     #region DeSerializeRespFunc
-                    var deserializeResp = "";
+                    string deserializeResp = "";
                     TlParam p2 = new TlParam() { Name = "Response", Type = c.Type };
                     deserializeResp += WriteReadCode(p2) + Environment.NewLine;
                     temp = temp.Replace("/* DESERIALIZEResp */", deserializeResp);
@@ -208,55 +251,93 @@ namespace Men.Telegram.ClientApi.Generator
                 }
             }
         }
-        public static string FormatName(string input)
+
+        private static async Task<string> LoadSchema()
         {
-            if (string.IsNullOrEmpty(input))
-                throw new ArgumentException("ARGH!");
-            if (input.IndexOf('.') != -1)
+            if (File.Exists(FullSchemaFileName))
             {
-                input = input.Replace(".", " ");
-                var temp = "";
-                foreach (var s in input.Split(' '))
-                {
-                    temp += FormatName(s) + " ";
-                }
-                input = temp.Trim();
+                return File.ReadAllText(FullSchemaFileName);
             }
-            return input.First().ToString().ToUpper() + input.Substring(1);
+
+            string schemaJson = string.Empty;
+            using (HttpClient httpClient = new HttpClient())
+            {
+                HttpResponseMessage response = await httpClient.GetAsync(c_SchemaUrl);
+                response.EnsureSuccessStatusCode();
+
+                schemaJson = await response.Content.ReadAsStringAsync();
+            }
+
+            File.WriteAllText(FullSchemaFileName, schemaJson);
+            return schemaJson;
         }
+
+
+        public static string FormatSentenceIntoCamelCaseString(string value)
+        {
+            if (string.IsNullOrEmpty(value))
+            {
+                throw new ArgumentException($"Argument {nameof(value)} can't be null or empty");
+            }
+
+            value = value
+                .Replace(".", " ")
+                .Replace(" ", null);
+
+            string firstUpperCaseString = $"{value.First().ToString().ToUpper()}{value[1..]}";
+            return firstUpperCaseString;
+        }
+
+
         public static string CheckForKeywordAndPascalCase(string name)
         {
             name = name.Replace("_", " ");
             name = System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(name);
             name = name.Replace(" ", "");
 
-            if (keywords.Contains(name)) return "@" + name;
+            if (keywords.Contains(name))
+            {
+                return "@" + name;
+            }
+
             return name;
         }
         public static string GetNameofClass(string type, bool isinterface = false, bool ismethod = false)
         {
             if (!ismethod)
             {
-                if (type.IndexOf('.') != -1 && type.IndexOf('?') == -1)
-                    return isinterface ? "TLAbs" + FormatName(type.Split('.')[1]) : "TL" + FormatName(type.Split('.')[1]);
-                else if (type.IndexOf('.') != -1 && type.IndexOf('?') != -1)
-                    return isinterface ? "TLAbs" + FormatName(type.Split('?')[1]) : "TL" + FormatName(type.Split('?')[1]);
+                if (type.Contains('.') && !type.Contains('?'))
+                {
+                    return isinterface ? "TLAbs" + FormatSentenceIntoCamelCaseString(type.Split('.')[1]) : "TL" + FormatSentenceIntoCamelCaseString(type.Split('.')[1]);
+                }
+                else if (type.Contains('.') && type.Contains('?'))
+                {
+                    return isinterface ? "TLAbs" + FormatSentenceIntoCamelCaseString(type.Split('?')[1]) : "TL" + FormatSentenceIntoCamelCaseString(type.Split('?')[1]);
+                }
                 else
-                    return isinterface ? "TLAbs" + FormatName(type) : "TL" + FormatName(type);
+                {
+                    return isinterface ? "TLAbs" + FormatSentenceIntoCamelCaseString(type) : "TL" + FormatSentenceIntoCamelCaseString(type);
+                }
             }
             else
             {
-                if (type.IndexOf('.') != -1 && type.IndexOf('?') == -1)
-                    return "TLRequest" + FormatName(type.Split('.')[1]);
-                else if (type.IndexOf('.') != -1 && type.IndexOf('?') != -1)
-                    return "TLRequest" + FormatName(type.Split('?')[1]);
+                if (type.Contains('.') && !type.Contains('?'))
+                {
+                    return "TLRequest" + FormatSentenceIntoCamelCaseString(type.Split('.')[1]);
+                }
+                else if (type.Contains('.') && type.Contains('?'))
+                {
+                    return "TLRequest" + FormatSentenceIntoCamelCaseString(type.Split('?')[1]);
+                }
                 else
-                    return "TLRequest" + FormatName(type);
+                {
+                    return "TLRequest" + FormatSentenceIntoCamelCaseString(type);
+                }
             }
         }
         private static bool IsFlagBase(string type)
         {
-            return type.IndexOf("?") != -1;
+            return type.Contains("?");
         }
         private static int GetBitMask(string type)
         {
@@ -266,23 +347,33 @@ namespace Men.Telegram.ClientApi.Generator
         {
             return type.Split('?')[1] == "true";
         }
+
         public static string GetNameSpace(string type)
-        {
-            if (type.IndexOf('.') != -1)
-                return "TeleSharp.TL" + FormatName(type.Split('.')[0]);
-            else
-                return "TeleSharp.TL";
-        }
+            => type.Contains('.')
+                ? $"TeleSharp.TL.{FormatSentenceIntoCamelCaseString(type.Split('.')[0])}"
+                : "TeleSharp.TL";
+
         public static string CheckForFlagBase(string type, string result)
         {
-            if (type.IndexOf('?') == -1)
+            if (!type.Contains('?'))
+            {
                 return result;
+            }
             else
             {
                 string innerType = type.Split('?')[1];
-                if (innerType == "true") return result;
-                else if ((new string[] { "bool", "int", "uint", "long", "double" }).Contains(result)) return result + "?";
-                else return result;
+                if (innerType == "true")
+                {
+                    return result;
+                }
+                else if ((new string[] { "bool", "int", "uint", "long", "double" }).Contains(result))
+                {
+                    return result + "?";
+                }
+                else
+                {
+                    return result;
+                }
             }
         }
         public static string GetTypeName(string type)
@@ -312,30 +403,45 @@ namespace Men.Telegram.ClientApi.Generator
             }
 
             if (type.StartsWith("Vector"))
+            {
                 return "TLVector<" + GetTypeName(type.Replace("Vector<", "").Replace(">", "")) + ">";
+            }
 
             if (type.ToLower().Contains("inputcontact"))
+            {
                 return "TLInputPhoneContact";
-
-
-            if (type.IndexOf('.') != -1 && type.IndexOf('?') == -1)
-            {
-
-                if (interfacesList.Any(x => x.ToLower() == type.ToLower()))
-                    return FormatName(type.Split('.')[0]) + "." + "TLAbs" + type.Split('.')[1];
-                else if (classesList.Any(x => x.ToLower() == type.ToLower()))
-                    return FormatName(type.Split('.')[0]) + "." + "TL" + type.Split('.')[1];
-                else
-                    return FormatName(type.Split('.')[1]);
             }
-            else if (type.IndexOf('?') == -1)
+
+            if (type.Contains('.') && !type.Contains('?'))
+            {
+
+                if (interfacesList.Any(x => x.ToLower() == type.ToLower()))
+                {
+                    return FormatSentenceIntoCamelCaseString(type.Split('.')[0]) + "." + "TLAbs" + type.Split('.')[1];
+                }
+                else if (classesList.Any(x => x.ToLower() == type.ToLower()))
+                {
+                    return FormatSentenceIntoCamelCaseString(type.Split('.')[0]) + "." + "TL" + type.Split('.')[1];
+                }
+                else
+                {
+                    return FormatSentenceIntoCamelCaseString(type.Split('.')[1]);
+                }
+            }
+            else if (!type.Contains('?'))
             {
                 if (interfacesList.Any(x => x.ToLower() == type.ToLower()))
+                {
                     return "TLAbs" + type;
+                }
                 else if (classesList.Any(x => x.ToLower() == type.ToLower()))
+                {
                     return "TL" + type;
+                }
                 else
+                {
                     return type;
+                }
             }
             else
             {
@@ -347,11 +453,17 @@ namespace Men.Telegram.ClientApi.Generator
         public static string LookTypeInLists(string src)
         {
             if (interfacesList.Any(x => x.ToLower() == src.ToLower()))
-                return "TLAbs" + FormatName(src);
+            {
+                return "TLAbs" + FormatSentenceIntoCamelCaseString(src);
+            }
             else if (classesList.Any(x => x.ToLower() == src.ToLower()))
-                return "TL" + FormatName(src);
+            {
+                return "TL" + FormatSentenceIntoCamelCaseString(src);
+            }
             else
+            {
                 return src;
+            }
         }
         public static string WriteWriteCode(TlParam p, bool flag = false)
         {
@@ -374,11 +486,15 @@ namespace Men.Telegram.ClientApi.Generator
                     return flag ? $"bw.Write({CheckForKeywordAndPascalCase(p.Name)}.Value);" : $"bw.Write({CheckForKeywordAndPascalCase(p.Name)});";
                 default:
                     if (!IsFlagBase(p.Type))
+                    {
                         return $"ObjectUtils.SerializeObject({CheckForKeywordAndPascalCase(p.Name)},bw);";
+                    }
                     else
                     {
                         if (IsTrueFlag(p.Type))
+                        {
                             return $"";
+                        }
                         else
                         {
                             TlParam p2 = new TlParam() { Name = p.Name, Type = p.Type.Split('?')[1] };
@@ -413,12 +529,17 @@ namespace Men.Telegram.ClientApi.Generator
                         {
                             return $"{CheckForKeywordAndPascalCase(p.Name)} = ({GetTypeName(p.Type)})ObjectUtils.DeserializeVector<{GetTypeName(p.Type).Replace("TLVector<", "").Replace(">", "")}>(br);";
                         }
-                        else return $"{CheckForKeywordAndPascalCase(p.Name)} = ({GetTypeName(p.Type)})ObjectUtils.DeserializeObject(br);";
+                        else
+                        {
+                            return $"{CheckForKeywordAndPascalCase(p.Name)} = ({GetTypeName(p.Type)})ObjectUtils.DeserializeObject(br);";
+                        }
                     }
                     else
                     {
                         if (IsTrueFlag(p.Type))
+                        {
                             return $"{CheckForKeywordAndPascalCase(p.Name)} = (Flags & {GetBitMask(p.Type).ToString()}) != 0;";
+                        }
                         else
                         {
                             TlParam p2 = new TlParam() { Name = p.Name, Type = p.Type.Split('?')[1] };
@@ -433,9 +554,15 @@ namespace Men.Telegram.ClientApi.Generator
         public static FileStream MakeFile(string path)
         {
             if (!Directory.Exists(Path.GetDirectoryName(path)))
+            {
                 Directory.CreateDirectory(Path.GetDirectoryName(path));
+            }
+
             if (File.Exists(path))
+            {
                 File.Delete(path);
+            }
+
             return File.OpenWrite(path);
         }
     }

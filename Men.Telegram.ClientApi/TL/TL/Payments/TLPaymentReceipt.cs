@@ -47,14 +47,22 @@ namespace TeleSharp.TL.Payments
             this.Invoice = (TLInvoice)ObjectUtils.DeserializeObject(br);
             this.ProviderId = br.ReadInt32();
             if ((this.Flags & 1) != 0)
+            {
                 this.Info = (TLPaymentRequestedInfo)ObjectUtils.DeserializeObject(br);
+            }
             else
+            {
                 this.Info = null;
+            }
 
             if ((this.Flags & 2) != 0)
+            {
                 this.Shipping = (TLShippingOption)ObjectUtils.DeserializeObject(br);
+            }
             else
+            {
                 this.Shipping = null;
+            }
 
             this.Currency = StringUtil.Deserialize(br);
             this.TotalAmount = br.ReadInt64();
@@ -73,9 +81,15 @@ namespace TeleSharp.TL.Payments
             ObjectUtils.SerializeObject(this.Invoice, bw);
             bw.Write(this.ProviderId);
             if ((this.Flags & 1) != 0)
+            {
                 ObjectUtils.SerializeObject(this.Info, bw);
+            }
+
             if ((this.Flags & 2) != 0)
+            {
                 ObjectUtils.SerializeObject(this.Shipping, bw);
+            }
+
             StringUtil.Serialize(this.Currency, bw);
             bw.Write(this.TotalAmount);
             StringUtil.Serialize(this.CredentialsTitle, bw);

@@ -1,20 +1,20 @@
 ﻿using System.Collections.Generic;
 using Newtonsoft.Json;
 
-namespace TeleSharp.Generator.Models
+namespace Men.Telegram.ClientApi.Generator.Models
 {
-    internal class TlMethod
+    public class TlMethod
     {
-        [JsonProperty("id")] 
+        [JsonProperty("id")]
         public int Id { get; set; }
 
-        [JsonProperty("method")] 
+        [JsonProperty("method")]
         public string Method { get; set; }
 
-        [JsonProperty("params")] 
+        [JsonProperty("params")]
         public List<TlParam> Params { get; set; }
 
-        [JsonProperty("type")] 
+        [JsonProperty("type")]
         public string Type { get; set; }
     }
 }

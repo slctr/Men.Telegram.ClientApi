@@ -85,9 +85,13 @@ namespace TeleSharp.TL
             this.RatingEDecay = br.ReadInt32();
             this.StickersRecentLimit = br.ReadInt32();
             if ((this.Flags & 1) != 0)
+            {
                 this.TmpSessions = br.ReadInt32();
+            }
             else
+            {
                 this.TmpSessions = null;
+            }
 
             this.PinnedDialogsCountMax = br.ReadInt32();
             this.CallReceiveTimeoutMs = br.ReadInt32();
@@ -127,7 +131,10 @@ namespace TeleSharp.TL
             bw.Write(this.RatingEDecay);
             bw.Write(this.StickersRecentLimit);
             if ((this.Flags & 1) != 0)
+            {
                 bw.Write(this.TmpSessions.Value);
+            }
+
             bw.Write(this.PinnedDialogsCountMax);
             bw.Write(this.CallReceiveTimeoutMs);
             bw.Write(this.CallRingTimeoutMs);

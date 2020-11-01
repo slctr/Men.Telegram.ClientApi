@@ -43,16 +43,22 @@ namespace TeleSharp.TL
             this.NeedDebug = (this.Flags & 8) != 0;
             this.Id = br.ReadInt64();
             if ((this.Flags & 1) != 0)
+            {
                 this.Reason = (TLAbsPhoneCallDiscardReason)ObjectUtils.DeserializeObject(br);
+            }
             else
+            {
                 this.Reason = null;
+            }
 
             if ((this.Flags & 2) != 0)
+            {
                 this.Duration = br.ReadInt32();
+            }
             else
+            {
                 this.Duration = null;
-
-
+            }
         }
 
         public override void SerializeBody(BinaryWriter bw)
@@ -64,10 +70,14 @@ namespace TeleSharp.TL
 
             bw.Write(this.Id);
             if ((this.Flags & 1) != 0)
+            {
                 ObjectUtils.SerializeObject(this.Reason, bw);
-            if ((this.Flags & 2) != 0)
-                bw.Write(this.Duration.Value);
+            }
 
+            if ((this.Flags & 2) != 0)
+            {
+                bw.Write(this.Duration.Value);
+            }
         }
     }
 }

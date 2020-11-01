@@ -51,21 +51,33 @@ namespace TeleSharp.TL
             this.PhoneCallsPrivate = (this.Flags & 32) != 0;
             this.User = (TLAbsUser)ObjectUtils.DeserializeObject(br);
             if ((this.Flags & 2) != 0)
+            {
                 this.About = StringUtil.Deserialize(br);
+            }
             else
+            {
                 this.About = null;
+            }
 
             this.Link = (Contacts.TLLink)ObjectUtils.DeserializeObject(br);
             if ((this.Flags & 4) != 0)
+            {
                 this.ProfilePhoto = (TLAbsPhoto)ObjectUtils.DeserializeObject(br);
+            }
             else
+            {
                 this.ProfilePhoto = null;
+            }
 
             this.NotifySettings = (TLAbsPeerNotifySettings)ObjectUtils.DeserializeObject(br);
             if ((this.Flags & 8) != 0)
+            {
                 this.BotInfo = (TLBotInfo)ObjectUtils.DeserializeObject(br);
+            }
             else
+            {
                 this.BotInfo = null;
+            }
 
             this.CommonChatsCount = br.ReadInt32();
 
@@ -81,13 +93,22 @@ namespace TeleSharp.TL
 
             ObjectUtils.SerializeObject(this.User, bw);
             if ((this.Flags & 2) != 0)
+            {
                 StringUtil.Serialize(this.About, bw);
+            }
+
             ObjectUtils.SerializeObject(this.Link, bw);
             if ((this.Flags & 4) != 0)
+            {
                 ObjectUtils.SerializeObject(this.ProfilePhoto, bw);
+            }
+
             ObjectUtils.SerializeObject(this.NotifySettings, bw);
             if ((this.Flags & 8) != 0)
+            {
                 ObjectUtils.SerializeObject(this.BotInfo, bw);
+            }
+
             bw.Write(this.CommonChatsCount);
 
         }

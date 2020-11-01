@@ -45,11 +45,13 @@ namespace TeleSharp.TL
             this.Description = StringUtil.Deserialize(br);
             this.Photo = (TLAbsPhoto)ObjectUtils.DeserializeObject(br);
             if ((this.Flags & 1) != 0)
+            {
                 this.Document = (TLAbsDocument)ObjectUtils.DeserializeObject(br);
+            }
             else
+            {
                 this.Document = null;
-
-
+            }
         }
 
         public override void SerializeBody(BinaryWriter bw)
@@ -64,8 +66,9 @@ namespace TeleSharp.TL
             StringUtil.Serialize(this.Description, bw);
             ObjectUtils.SerializeObject(this.Photo, bw);
             if ((this.Flags & 1) != 0)
+            {
                 ObjectUtils.SerializeObject(this.Document, bw);
-
+            }
         }
     }
 }

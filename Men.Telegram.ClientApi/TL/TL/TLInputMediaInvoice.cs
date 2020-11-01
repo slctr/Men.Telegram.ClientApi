@@ -41,9 +41,13 @@ namespace TeleSharp.TL
             this.Title = StringUtil.Deserialize(br);
             this.Description = StringUtil.Deserialize(br);
             if ((this.Flags & 1) != 0)
+            {
                 this.Photo = (TLInputWebDocument)ObjectUtils.DeserializeObject(br);
+            }
             else
+            {
                 this.Photo = null;
+            }
 
             this.Invoice = (TLInvoice)ObjectUtils.DeserializeObject(br);
             this.Payload = BytesUtil.Deserialize(br);
@@ -60,7 +64,10 @@ namespace TeleSharp.TL
             StringUtil.Serialize(this.Title, bw);
             StringUtil.Serialize(this.Description, bw);
             if ((this.Flags & 1) != 0)
+            {
                 ObjectUtils.SerializeObject(this.Photo, bw);
+            }
+
             ObjectUtils.SerializeObject(this.Invoice, bw);
             BytesUtil.Serialize(this.Payload, bw);
             StringUtil.Serialize(this.Provider, bw);

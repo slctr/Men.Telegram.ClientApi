@@ -63,11 +63,13 @@ namespace TeleSharp.TL
             this.Date = br.ReadInt32();
             this.Version = br.ReadInt32();
             if ((this.Flags & 64) != 0)
+            {
                 this.MigratedTo = (TLAbsInputChannel)ObjectUtils.DeserializeObject(br);
+            }
             else
+            {
                 this.MigratedTo = null;
-
-
+            }
         }
 
         public override void SerializeBody(BinaryWriter bw)
@@ -88,8 +90,9 @@ namespace TeleSharp.TL
             bw.Write(this.Date);
             bw.Write(this.Version);
             if ((this.Flags & 64) != 0)
+            {
                 ObjectUtils.SerializeObject(this.MigratedTo, bw);
-
+            }
         }
     }
 }

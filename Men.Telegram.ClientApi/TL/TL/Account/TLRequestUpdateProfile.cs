@@ -38,21 +38,31 @@ namespace TeleSharp.TL.Account
         {
             this.Flags = br.ReadInt32();
             if ((this.Flags & 1) != 0)
+            {
                 this.FirstName = StringUtil.Deserialize(br);
+            }
             else
+            {
                 this.FirstName = null;
+            }
 
             if ((this.Flags & 2) != 0)
+            {
                 this.LastName = StringUtil.Deserialize(br);
+            }
             else
+            {
                 this.LastName = null;
+            }
 
             if ((this.Flags & 4) != 0)
+            {
                 this.About = StringUtil.Deserialize(br);
+            }
             else
+            {
                 this.About = null;
-
-
+            }
         }
 
         public override void SerializeBody(BinaryWriter bw)
@@ -61,12 +71,19 @@ namespace TeleSharp.TL.Account
             this.ComputeFlags();
             bw.Write(this.Flags);
             if ((this.Flags & 1) != 0)
+            {
                 StringUtil.Serialize(this.FirstName, bw);
-            if ((this.Flags & 2) != 0)
-                StringUtil.Serialize(this.LastName, bw);
-            if ((this.Flags & 4) != 0)
-                StringUtil.Serialize(this.About, bw);
+            }
 
+            if ((this.Flags & 2) != 0)
+            {
+                StringUtil.Serialize(this.LastName, bw);
+            }
+
+            if ((this.Flags & 4) != 0)
+            {
+                StringUtil.Serialize(this.About, bw);
+            }
         }
         public override void DeserializeResponse(BinaryReader br)
         {

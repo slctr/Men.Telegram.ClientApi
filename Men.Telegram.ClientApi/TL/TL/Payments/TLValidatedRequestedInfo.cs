@@ -35,16 +35,22 @@ namespace TeleSharp.TL.Payments
         {
             this.Flags = br.ReadInt32();
             if ((this.Flags & 1) != 0)
+            {
                 this.Id = StringUtil.Deserialize(br);
+            }
             else
+            {
                 this.Id = null;
+            }
 
             if ((this.Flags & 2) != 0)
+            {
                 this.ShippingOptions = (TLVector<TLShippingOption>)ObjectUtils.DeserializeVector<TLShippingOption>(br);
+            }
             else
+            {
                 this.ShippingOptions = null;
-
-
+            }
         }
 
         public override void SerializeBody(BinaryWriter bw)
@@ -53,10 +59,14 @@ namespace TeleSharp.TL.Payments
             this.ComputeFlags();
             bw.Write(this.Flags);
             if ((this.Flags & 1) != 0)
+            {
                 StringUtil.Serialize(this.Id, bw);
-            if ((this.Flags & 2) != 0)
-                ObjectUtils.SerializeObject(this.ShippingOptions, bw);
+            }
 
+            if ((this.Flags & 2) != 0)
+            {
+                ObjectUtils.SerializeObject(this.ShippingOptions, bw);
+            }
         }
     }
 }

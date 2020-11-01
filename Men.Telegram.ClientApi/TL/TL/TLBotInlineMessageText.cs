@@ -40,16 +40,22 @@ namespace TeleSharp.TL
             this.NoWebpage = (this.Flags & 1) != 0;
             this.Message = StringUtil.Deserialize(br);
             if ((this.Flags & 2) != 0)
+            {
                 this.Entities = (TLVector<TLAbsMessageEntity>)ObjectUtils.DeserializeVector<TLAbsMessageEntity>(br);
+            }
             else
+            {
                 this.Entities = null;
+            }
 
             if ((this.Flags & 4) != 0)
+            {
                 this.ReplyMarkup = (TLAbsReplyMarkup)ObjectUtils.DeserializeObject(br);
+            }
             else
+            {
                 this.ReplyMarkup = null;
-
-
+            }
         }
 
         public override void SerializeBody(BinaryWriter bw)
@@ -60,10 +66,14 @@ namespace TeleSharp.TL
 
             StringUtil.Serialize(this.Message, bw);
             if ((this.Flags & 2) != 0)
+            {
                 ObjectUtils.SerializeObject(this.Entities, bw);
-            if ((this.Flags & 4) != 0)
-                ObjectUtils.SerializeObject(this.ReplyMarkup, bw);
+            }
 
+            if ((this.Flags & 4) != 0)
+            {
+                ObjectUtils.SerializeObject(this.ReplyMarkup, bw);
+            }
         }
     }
 }

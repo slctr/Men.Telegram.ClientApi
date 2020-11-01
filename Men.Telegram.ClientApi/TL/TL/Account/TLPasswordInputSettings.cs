@@ -39,26 +39,40 @@ namespace TeleSharp.TL.Account
         {
             this.Flags = br.ReadInt32();
             if ((this.Flags & 1) != 0)
+            {
                 this.NewSalt = BytesUtil.Deserialize(br);
+            }
             else
+            {
                 this.NewSalt = null;
+            }
 
             if ((this.Flags & 1) != 0)
+            {
                 this.NewPasswordHash = BytesUtil.Deserialize(br);
+            }
             else
+            {
                 this.NewPasswordHash = null;
+            }
 
             if ((this.Flags & 1) != 0)
+            {
                 this.Hint = StringUtil.Deserialize(br);
+            }
             else
+            {
                 this.Hint = null;
+            }
 
             if ((this.Flags & 2) != 0)
+            {
                 this.Email = StringUtil.Deserialize(br);
+            }
             else
+            {
                 this.Email = null;
-
-
+            }
         }
 
         public override void SerializeBody(BinaryWriter bw)
@@ -67,14 +81,24 @@ namespace TeleSharp.TL.Account
             this.ComputeFlags();
             bw.Write(this.Flags);
             if ((this.Flags & 1) != 0)
+            {
                 BytesUtil.Serialize(this.NewSalt, bw);
-            if ((this.Flags & 1) != 0)
-                BytesUtil.Serialize(this.NewPasswordHash, bw);
-            if ((this.Flags & 1) != 0)
-                StringUtil.Serialize(this.Hint, bw);
-            if ((this.Flags & 2) != 0)
-                StringUtil.Serialize(this.Email, bw);
+            }
 
+            if ((this.Flags & 1) != 0)
+            {
+                BytesUtil.Serialize(this.NewPasswordHash, bw);
+            }
+
+            if ((this.Flags & 1) != 0)
+            {
+                StringUtil.Serialize(this.Hint, bw);
+            }
+
+            if ((this.Flags & 2) != 0)
+            {
+                StringUtil.Serialize(this.Email, bw);
+            }
         }
     }
 }

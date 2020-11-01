@@ -50,16 +50,22 @@ namespace TeleSharp.TL
             this.UnreadCount = br.ReadInt32();
             this.NotifySettings = (TLAbsPeerNotifySettings)ObjectUtils.DeserializeObject(br);
             if ((this.Flags & 1) != 0)
+            {
                 this.Pts = br.ReadInt32();
+            }
             else
+            {
                 this.Pts = null;
+            }
 
             if ((this.Flags & 2) != 0)
+            {
                 this.Draft = (TLAbsDraftMessage)ObjectUtils.DeserializeObject(br);
+            }
             else
+            {
                 this.Draft = null;
-
-
+            }
         }
 
         public override void SerializeBody(BinaryWriter bw)
@@ -75,10 +81,14 @@ namespace TeleSharp.TL
             bw.Write(this.UnreadCount);
             ObjectUtils.SerializeObject(this.NotifySettings, bw);
             if ((this.Flags & 1) != 0)
+            {
                 bw.Write(this.Pts.Value);
-            if ((this.Flags & 2) != 0)
-                ObjectUtils.SerializeObject(this.Draft, bw);
+            }
 
+            if ((this.Flags & 2) != 0)
+            {
+                ObjectUtils.SerializeObject(this.Draft, bw);
+            }
         }
     }
 }

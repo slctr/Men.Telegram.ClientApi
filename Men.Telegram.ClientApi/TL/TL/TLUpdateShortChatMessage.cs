@@ -65,26 +65,40 @@ namespace TeleSharp.TL
             this.PtsCount = br.ReadInt32();
             this.Date = br.ReadInt32();
             if ((this.Flags & 4) != 0)
+            {
                 this.FwdFrom = (TLMessageFwdHeader)ObjectUtils.DeserializeObject(br);
+            }
             else
+            {
                 this.FwdFrom = null;
+            }
 
             if ((this.Flags & 2048) != 0)
+            {
                 this.ViaBotId = br.ReadInt32();
+            }
             else
+            {
                 this.ViaBotId = null;
+            }
 
             if ((this.Flags & 8) != 0)
+            {
                 this.ReplyToMsgId = br.ReadInt32();
+            }
             else
+            {
                 this.ReplyToMsgId = null;
+            }
 
             if ((this.Flags & 128) != 0)
+            {
                 this.Entities = (TLVector<TLAbsMessageEntity>)ObjectUtils.DeserializeVector<TLAbsMessageEntity>(br);
+            }
             else
+            {
                 this.Entities = null;
-
-
+            }
         }
 
         public override void SerializeBody(BinaryWriter bw)
@@ -104,14 +118,24 @@ namespace TeleSharp.TL
             bw.Write(this.PtsCount);
             bw.Write(this.Date);
             if ((this.Flags & 4) != 0)
+            {
                 ObjectUtils.SerializeObject(this.FwdFrom, bw);
-            if ((this.Flags & 2048) != 0)
-                bw.Write(this.ViaBotId.Value);
-            if ((this.Flags & 8) != 0)
-                bw.Write(this.ReplyToMsgId.Value);
-            if ((this.Flags & 128) != 0)
-                ObjectUtils.SerializeObject(this.Entities, bw);
+            }
 
+            if ((this.Flags & 2048) != 0)
+            {
+                bw.Write(this.ViaBotId.Value);
+            }
+
+            if ((this.Flags & 8) != 0)
+            {
+                bw.Write(this.ReplyToMsgId.Value);
+            }
+
+            if ((this.Flags & 128) != 0)
+            {
+                ObjectUtils.SerializeObject(this.Entities, bw);
+            }
         }
     }
 }

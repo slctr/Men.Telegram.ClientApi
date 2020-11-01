@@ -196,7 +196,11 @@ namespace TLSharp.Core.MTProto.Crypto
             //
             this.Update(128);
 
-            while (this.xBufOff != 0) this.Update(0);
+            while (this.xBufOff != 0)
+            {
+                this.Update(0);
+            }
+
             this.ProcessLength(bitLength);
             this.ProcessBlock();
         }

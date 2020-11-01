@@ -35,11 +35,13 @@ namespace TeleSharp.TL
             this.Flags = br.ReadInt32();
             this.Caption = StringUtil.Deserialize(br);
             if ((this.Flags & 4) != 0)
+            {
                 this.ReplyMarkup = (TLAbsReplyMarkup)ObjectUtils.DeserializeObject(br);
+            }
             else
+            {
                 this.ReplyMarkup = null;
-
-
+            }
         }
 
         public override void SerializeBody(BinaryWriter bw)
@@ -49,8 +51,9 @@ namespace TeleSharp.TL
             bw.Write(this.Flags);
             StringUtil.Serialize(this.Caption, bw);
             if ((this.Flags & 4) != 0)
+            {
                 ObjectUtils.SerializeObject(this.ReplyMarkup, bw);
-
+            }
         }
     }
 }

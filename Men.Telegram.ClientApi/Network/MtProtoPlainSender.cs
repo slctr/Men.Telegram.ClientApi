@@ -22,9 +22,9 @@ namespace TLSharp.Core.Network
         {
             token.ThrowIfCancellationRequested();
 
-            using (var memoryStream = new MemoryStream())
+            using (MemoryStream memoryStream = new MemoryStream())
             {
-                using (var binaryWriter = new BinaryWriter(memoryStream))
+                using (BinaryWriter binaryWriter = new BinaryWriter(memoryStream))
                 {
                     binaryWriter.Write((long)0);
                     binaryWriter.Write(this.GetNewMessageId());
@@ -42,9 +42,9 @@ namespace TLSharp.Core.Network
         {
             token.ThrowIfCancellationRequested();
 
-            var result = await this.transport.Receive(token).ConfigureAwait(false);
+            TcpMessage result = await this.transport.Receive(token).ConfigureAwait(false);
 
-            using (var memoryStream = new MemoryStream(result.Body))
+            using (MemoryStream memoryStream = new MemoryStream(result.Body))
             {
                 using (BinaryReader binaryReader = new BinaryReader(memoryStream))
                 {

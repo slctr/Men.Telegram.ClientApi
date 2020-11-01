@@ -40,9 +40,13 @@ namespace TeleSharp.TL
             this.Flags = br.ReadInt32();
             this.Popup = (this.Flags & 1) != 0;
             if ((this.Flags & 2) != 0)
+            {
                 this.InboxDate = br.ReadInt32();
+            }
             else
+            {
                 this.InboxDate = null;
+            }
 
             this.Type = StringUtil.Deserialize(br);
             this.Message = StringUtil.Deserialize(br);
@@ -58,7 +62,10 @@ namespace TeleSharp.TL
             bw.Write(this.Flags);
 
             if ((this.Flags & 2) != 0)
+            {
                 bw.Write(this.InboxDate.Value);
+            }
+
             StringUtil.Serialize(this.Type, bw);
             StringUtil.Serialize(this.Message, bw);
             ObjectUtils.SerializeObject(this.Media, bw);

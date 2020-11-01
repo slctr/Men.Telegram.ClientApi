@@ -43,7 +43,10 @@ namespace TeleSharp.TL
         {
             int constructorId = reader.ReadInt32();
             if (constructorId != this.Constructor)
+            {
                 throw new InvalidDataException("Constructor Invalid");
+            }
+
             this.DeserializeBody(reader);
         }
     }

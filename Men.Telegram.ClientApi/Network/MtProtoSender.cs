@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using Men.Telegram.ClientApi.Core.Sessions;
 using TeleSharp.TL;
 using TLSharp.Core.Exceptions;
 using TLSharp.Core.MTProto;
@@ -22,11 +23,11 @@ namespace TLSharp.Core.Network
         //private ulong sessionId = GenerateRandomUlong();
 
         private readonly TcpTransport transport;
-        private readonly Session session;
+        private readonly TelegramSession session;
 
         public readonly List<ulong> needConfirmation = new List<ulong>();
 
-        public MtProtoSender(TcpTransport transport, Session session)
+        public MtProtoSender(TcpTransport transport, TelegramSession session)
         {
             this.transport = transport;
             this.session = session;
@@ -34,11 +35,15 @@ namespace TLSharp.Core.Network
 
         private int GenerateSequence(bool confirmed)
         {
-            lock (this.session.Lock) {
-                try {
+            lock (this.session.Lock)
+            {
+                try
+                {
                     return confirmed ? this.session.Sequence++ * 2 + 1 : this.session.Sequence * 2;
-                } finally {
-                    this.session.Save ();
+                }
+                finally
+                {
+                    this.session.Save();
                 }
             }
         }
@@ -50,9 +55,9 @@ namespace TLSharp.Core.Network
             // TODO: refactor
             if (this.needConfirmation.Any())
             {
-                var ackRequest = new AckRequest(this.needConfirmation);
-                using (var memory = new MemoryStream())
-                using (var writer = new BinaryWriter(memory))
+                AckRequest ackRequest = new AckRequest(this.needConfirmation);
+                using (MemoryStream memory = new MemoryStream())
+                using (BinaryWriter writer = new BinaryWriter(memory))
                 {
                     ackRequest.SerializeBody(writer);
                     await this.Send(memory.ToArray(), ackRequest, token).ConfigureAwait(false);
@@ -61,8 +66,8 @@ namespace TLSharp.Core.Network
             }
 
 
-            using (var memory = new MemoryStream())
-            using (var writer = new BinaryWriter(memory))
+            using (MemoryStream memory = new MemoryStream())
+            using (BinaryWriter writer = new BinaryWriter(memory))
             {
                 request.SerializeBody(writer);
                 await this.Send(memory.ToArray(), request, token).ConfigureAwait(false);
@@ -114,11 +119,13 @@ namespace TLSharp.Core.Network
             ulong remoteMessageId;
             int remoteSequence;
 
-            using (var inputStream = new MemoryStream(body))
-            using (var inputReader = new BinaryReader(inputStream))
+            using (MemoryStream inputStream = new MemoryStream(body))
+            using (BinaryReader inputReader = new BinaryReader(inputStream))
             {
                 if (inputReader.BaseStream.Length < 8)
+                {
                     throw new InvalidOperationException($"Can't decode packet");
+                }
 
                 ulong remoteAuthKeyId = inputReader.ReadUInt64(); // TODO: check auth key id
                 byte[] msgKey = inputReader.ReadBytes(16); // TODO: check msg_key correctness
@@ -129,8 +136,8 @@ namespace TLSharp.Core.Network
                 using (MemoryStream plaintextStream = new MemoryStream(plaintext))
                 using (BinaryReader plaintextReader = new BinaryReader(plaintextStream))
                 {
-                    var remoteSalt = plaintextReader.ReadUInt64();
-                    var remoteSessionId = plaintextReader.ReadUInt64();
+                    ulong remoteSalt = plaintextReader.ReadUInt64();
+                    ulong remoteSessionId = plaintextReader.ReadUInt64();
                     remoteMessageId = plaintextReader.ReadUInt64();
                     remoteSequence = plaintextReader.ReadInt32();
                     int msgLen = plaintextReader.ReadInt32();
@@ -144,10 +151,10 @@ namespace TLSharp.Core.Network
         {
             while (!request.ConfirmReceived)
             {
-                var result = this.DecodeMessage((await this.transport.Receive(token).ConfigureAwait(false)).Body);
+                Tuple<byte[], ulong, int> result = this.DecodeMessage((await this.transport.Receive(token).ConfigureAwait(false)).Body);
 
-                using (var messageStream = new MemoryStream(result.Item1, false))
-                using (var messageReader = new BinaryReader(messageStream))
+                using (MemoryStream messageStream = new MemoryStream(result.Item1, false))
+                using (BinaryReader messageReader = new BinaryReader(messageStream))
                 {
                     this.processMessage(result.Item2, result.Item3, messageReader, request, token);
                 }
@@ -162,9 +169,9 @@ namespace TLSharp.Core.Network
         {
             token.ThrowIfCancellationRequested();
 
-            var pingRequest = new PingRequest();
-            using (var memory = new MemoryStream())
-            using (var writer = new BinaryWriter(memory))
+            PingRequest pingRequest = new PingRequest();
+            using (MemoryStream memory = new MemoryStream())
+            using (BinaryWriter writer = new BinaryWriter(memory))
             {
                 pingRequest.SerializeBody(writer);
                 await this.Send(memory.ToArray(), pingRequest, token).ConfigureAwait(false);
@@ -259,10 +266,10 @@ namespace TLSharp.Core.Network
             uint code = messageReader.ReadUInt32();
 
             byte[] packedData = Serializers.Bytes.Read(messageReader);
-            using (var ms = new MemoryStream())
+            using (MemoryStream ms = new MemoryStream())
             {
-                using (var packedStream = new MemoryStream(packedData, false))
-                using (var zipStream = new GZipStream(packedStream, CompressionMode.Decompress))
+                using (MemoryStream packedStream = new MemoryStream(packedData, false))
+                using (GZipStream zipStream = new GZipStream(packedStream, CompressionMode.Decompress))
                 {
                     zipStream.CopyTo(ms);
                     ms.Position = 0;
@@ -282,7 +289,9 @@ namespace TLSharp.Core.Network
             ulong requestId = messageReader.ReadUInt64();
 
             if (requestId == (ulong)request.MessageId)
+            {
                 request.ConfirmReceived = true;
+            }
 
             //throw new NotImplementedException();
             /*
@@ -308,32 +317,32 @@ namespace TLSharp.Core.Network
 
                 if (errorMessage.StartsWith("FLOOD_WAIT_"))
                 {
-                    var resultString = Regex.Match(errorMessage, @"\d+").Value;
-                    var seconds = int.Parse(resultString);
+                    string resultString = Regex.Match(errorMessage, @"\d+").Value;
+                    int seconds = int.Parse(resultString);
                     throw new FloodException(TimeSpan.FromSeconds(seconds));
                 }
                 else if (errorMessage.StartsWith("PHONE_MIGRATE_"))
                 {
-                    var resultString = Regex.Match(errorMessage, @"\d+").Value;
-                    var dcIdx = int.Parse(resultString);
+                    string resultString = Regex.Match(errorMessage, @"\d+").Value;
+                    int dcIdx = int.Parse(resultString);
                     throw new PhoneMigrationException(dcIdx);
                 }
                 else if (errorMessage.StartsWith("FILE_MIGRATE_"))
                 {
-                    var resultString = Regex.Match(errorMessage, @"\d+").Value;
-                    var dcIdx = int.Parse(resultString);
+                    string resultString = Regex.Match(errorMessage, @"\d+").Value;
+                    int dcIdx = int.Parse(resultString);
                     throw new FileMigrationException(dcIdx);
                 }
                 else if (errorMessage.StartsWith("USER_MIGRATE_"))
                 {
-                    var resultString = Regex.Match(errorMessage, @"\d+").Value;
-                    var dcIdx = int.Parse(resultString);
+                    string resultString = Regex.Match(errorMessage, @"\d+").Value;
+                    int dcIdx = int.Parse(resultString);
                     throw new UserMigrationException(dcIdx);
                 }
                 else if (errorMessage.StartsWith("NETWORK_MIGRATE_"))
                 {
-                    var resultString = Regex.Match(errorMessage, @"\d+").Value;
-                    var dcIdx = int.Parse(resultString);
+                    string resultString = Regex.Match(errorMessage, @"\d+").Value;
+                    int dcIdx = int.Parse(resultString);
                     throw new NetworkMigrationException(dcIdx);
                 }
                 else if (errorMessage == "PHONE_CODE_INVALID")
@@ -354,15 +363,15 @@ namespace TLSharp.Core.Network
             {
                 // gzip_packed
                 byte[] packedData = Serializers.Bytes.Read(messageReader);
-                using (var ms = new MemoryStream())
+                using (MemoryStream ms = new MemoryStream())
                 {
-                    using (var packedStream = new MemoryStream(packedData, false))
-                    using (var zipStream = new GZipStream(packedStream, CompressionMode.Decompress))
+                    using (MemoryStream packedStream = new MemoryStream(packedData, false))
+                    using (GZipStream zipStream = new GZipStream(packedStream, CompressionMode.Decompress))
                     {
                         zipStream.CopyTo(ms);
                         ms.Position = 0;
                     }
-                    using (var compressedReader = new BinaryReader(ms))
+                    using (BinaryReader compressedReader = new BinaryReader(ms))
                     {
                         request.DeserializeResponse(compressedReader);
                     }

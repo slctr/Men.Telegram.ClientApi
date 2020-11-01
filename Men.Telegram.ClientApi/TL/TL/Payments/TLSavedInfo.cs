@@ -36,11 +36,13 @@ namespace TeleSharp.TL.Payments
             this.Flags = br.ReadInt32();
             this.HasSavedCredentials = (this.Flags & 2) != 0;
             if ((this.Flags & 1) != 0)
+            {
                 this.SavedInfo = (TLPaymentRequestedInfo)ObjectUtils.DeserializeObject(br);
+            }
             else
+            {
                 this.SavedInfo = null;
-
-
+            }
         }
 
         public override void SerializeBody(BinaryWriter bw)
@@ -50,8 +52,9 @@ namespace TeleSharp.TL.Payments
             bw.Write(this.Flags);
 
             if ((this.Flags & 1) != 0)
+            {
                 ObjectUtils.SerializeObject(this.SavedInfo, bw);
-
+            }
         }
     }
 }

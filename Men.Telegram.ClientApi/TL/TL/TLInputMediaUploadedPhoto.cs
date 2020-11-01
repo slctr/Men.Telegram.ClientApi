@@ -37,11 +37,13 @@ namespace TeleSharp.TL
             this.File = (TLAbsInputFile)ObjectUtils.DeserializeObject(br);
             this.Caption = StringUtil.Deserialize(br);
             if ((this.Flags & 1) != 0)
+            {
                 this.Stickers = (TLVector<TLAbsInputDocument>)ObjectUtils.DeserializeVector<TLAbsInputDocument>(br);
+            }
             else
+            {
                 this.Stickers = null;
-
-
+            }
         }
 
         public override void SerializeBody(BinaryWriter bw)
@@ -52,8 +54,9 @@ namespace TeleSharp.TL
             ObjectUtils.SerializeObject(this.File, bw);
             StringUtil.Serialize(this.Caption, bw);
             if ((this.Flags & 1) != 0)
+            {
                 ObjectUtils.SerializeObject(this.Stickers, bw);
-
+            }
         }
     }
 }

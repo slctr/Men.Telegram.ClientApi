@@ -39,11 +39,13 @@ namespace TeleSharp.TL.Account
             this.AllowFlashcall = (this.Flags & 1) != 0;
             this.PhoneNumber = StringUtil.Deserialize(br);
             if ((this.Flags & 1) != 0)
+            {
                 this.CurrentNumber = BoolUtil.Deserialize(br);
+            }
             else
+            {
                 this.CurrentNumber = null;
-
-
+            }
         }
 
         public override void SerializeBody(BinaryWriter bw)
@@ -54,8 +56,9 @@ namespace TeleSharp.TL.Account
 
             StringUtil.Serialize(this.PhoneNumber, bw);
             if ((this.Flags & 1) != 0)
+            {
                 BoolUtil.Serialize(this.CurrentNumber.Value, bw);
-
+            }
         }
         public override void DeserializeResponse(BinaryReader br)
         {

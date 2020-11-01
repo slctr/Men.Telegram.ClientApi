@@ -54,49 +54,85 @@ namespace TeleSharp.TL
             this.Id = StringUtil.Deserialize(br);
             this.Type = StringUtil.Deserialize(br);
             if ((this.Flags & 2) != 0)
+            {
                 this.Title = StringUtil.Deserialize(br);
+            }
             else
+            {
                 this.Title = null;
+            }
 
             if ((this.Flags & 4) != 0)
+            {
                 this.Description = StringUtil.Deserialize(br);
+            }
             else
+            {
                 this.Description = null;
+            }
 
             if ((this.Flags & 8) != 0)
+            {
                 this.Url = StringUtil.Deserialize(br);
+            }
             else
+            {
                 this.Url = null;
+            }
 
             if ((this.Flags & 16) != 0)
+            {
                 this.ThumbUrl = StringUtil.Deserialize(br);
+            }
             else
+            {
                 this.ThumbUrl = null;
+            }
 
             if ((this.Flags & 32) != 0)
+            {
                 this.ContentUrl = StringUtil.Deserialize(br);
+            }
             else
+            {
                 this.ContentUrl = null;
+            }
 
             if ((this.Flags & 32) != 0)
+            {
                 this.ContentType = StringUtil.Deserialize(br);
+            }
             else
+            {
                 this.ContentType = null;
+            }
 
             if ((this.Flags & 64) != 0)
+            {
                 this.W = br.ReadInt32();
+            }
             else
+            {
                 this.W = null;
+            }
 
             if ((this.Flags & 64) != 0)
+            {
                 this.H = br.ReadInt32();
+            }
             else
+            {
                 this.H = null;
+            }
 
             if ((this.Flags & 128) != 0)
+            {
                 this.Duration = br.ReadInt32();
+            }
             else
+            {
                 this.Duration = null;
+            }
 
             this.SendMessage = (TLAbsBotInlineMessage)ObjectUtils.DeserializeObject(br);
 
@@ -110,23 +146,50 @@ namespace TeleSharp.TL
             StringUtil.Serialize(this.Id, bw);
             StringUtil.Serialize(this.Type, bw);
             if ((this.Flags & 2) != 0)
+            {
                 StringUtil.Serialize(this.Title, bw);
+            }
+
             if ((this.Flags & 4) != 0)
+            {
                 StringUtil.Serialize(this.Description, bw);
+            }
+
             if ((this.Flags & 8) != 0)
+            {
                 StringUtil.Serialize(this.Url, bw);
+            }
+
             if ((this.Flags & 16) != 0)
+            {
                 StringUtil.Serialize(this.ThumbUrl, bw);
+            }
+
             if ((this.Flags & 32) != 0)
+            {
                 StringUtil.Serialize(this.ContentUrl, bw);
+            }
+
             if ((this.Flags & 32) != 0)
+            {
                 StringUtil.Serialize(this.ContentType, bw);
+            }
+
             if ((this.Flags & 64) != 0)
+            {
                 bw.Write(this.W.Value);
+            }
+
             if ((this.Flags & 64) != 0)
+            {
                 bw.Write(this.H.Value);
+            }
+
             if ((this.Flags & 128) != 0)
+            {
                 bw.Write(this.Duration.Value);
+            }
+
             ObjectUtils.SerializeObject(this.SendMessage, bw);
 
         }

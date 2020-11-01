@@ -41,11 +41,13 @@ namespace TeleSharp.TL.Messages
             this.Peer = (TLAbsInputPeer)ObjectUtils.DeserializeObject(br);
             this.MsgId = br.ReadInt32();
             if ((this.Flags & 1) != 0)
+            {
                 this.Data = BytesUtil.Deserialize(br);
+            }
             else
+            {
                 this.Data = null;
-
-
+            }
         }
 
         public override void SerializeBody(BinaryWriter bw)
@@ -57,8 +59,9 @@ namespace TeleSharp.TL.Messages
             ObjectUtils.SerializeObject(this.Peer, bw);
             bw.Write(this.MsgId);
             if ((this.Flags & 1) != 0)
+            {
                 BytesUtil.Serialize(this.Data, bw);
-
+            }
         }
         public override void DeserializeResponse(BinaryReader br)
         {

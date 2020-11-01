@@ -13,7 +13,9 @@ namespace TLSharp.Core.Network
         public TcpMessage(int seqNumber, byte[] body)
         {
             if (body == null)
+            {
                 throw new ArgumentNullException(nameof(body));
+            }
 
             this.SequneceNumber = seqNumber;
             this.Body = body;
@@ -21,9 +23,9 @@ namespace TLSharp.Core.Network
 
         public byte[] Encode()
         {
-            using (var memoryStream = new MemoryStream())
+            using (MemoryStream memoryStream = new MemoryStream())
             {
-                using (var binaryWriter = new BinaryWriter(memoryStream))
+                using (BinaryWriter binaryWriter = new BinaryWriter(memoryStream))
                 {
                     // https://core.telegram.org/mtproto#tcp-transport
                     /*
@@ -36,11 +38,11 @@ namespace TLSharp.Core.Network
                     binaryWriter.Write(this.Body.Length + 12);
                     binaryWriter.Write(this.SequneceNumber);
                     binaryWriter.Write(this.Body);
-                    var crc32 = new Crc32();
-                    var checksum = crc32.ComputeHash(memoryStream.GetBuffer(), 0, 8 + this.Body.Length).Reverse().ToArray();
+                    Crc32 crc32 = new Crc32();
+                    byte[] checksum = crc32.ComputeHash(memoryStream.GetBuffer(), 0, 8 + this.Body.Length).Reverse().ToArray();
                     binaryWriter.Write(checksum);
 
-                    var transportPacket = memoryStream.ToArray();
+                    byte[] transportPacket = memoryStream.ToArray();
 
                     //					Debug.WriteLine("Tcp packet #{0}\n{1}", SequneceNumber, BitConverter.ToString(transportPacket));
 
@@ -52,26 +54,32 @@ namespace TLSharp.Core.Network
         public static TcpMessage Decode(byte[] body)
         {
             if (body == null)
+            {
                 throw new ArgumentNullException(nameof(body));
+            }
 
             if (body.Length < 12)
-                throw new InvalidOperationException("Ops, wrong size of input packet");
-
-            using (var memoryStream = new MemoryStream(body))
             {
-                using (var binaryReader = new BinaryReader(memoryStream))
+                throw new InvalidOperationException("Ops, wrong size of input packet");
+            }
+
+            using (MemoryStream memoryStream = new MemoryStream(body))
+            {
+                using (BinaryReader binaryReader = new BinaryReader(memoryStream))
                 {
-                    var packetLength = binaryReader.ReadInt32();
+                    int packetLength = binaryReader.ReadInt32();
 
                     if (packetLength < 12)
+                    {
                         throw new InvalidOperationException(string.Format("invalid packet length: {0}", packetLength));
+                    }
 
-                    var seq = binaryReader.ReadInt32();
+                    int seq = binaryReader.ReadInt32();
                     byte[] packet = binaryReader.ReadBytes(packetLength - 12);
-                    var checksum = binaryReader.ReadBytes(4);
+                    byte[] checksum = binaryReader.ReadBytes(4);
 
-                    var crc32 = new Crc32();
-                    var computedChecksum = crc32.ComputeHash(body, 0, packetLength - 4).Reverse();
+                    Crc32 crc32 = new Crc32();
+                    System.Collections.Generic.IEnumerable<byte> computedChecksum = crc32.ComputeHash(body, 0, packetLength - 4).Reverse();
 
                     if (!checksum.SequenceEqual(computedChecksum))
                     {

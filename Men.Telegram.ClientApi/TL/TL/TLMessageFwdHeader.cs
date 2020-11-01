@@ -38,22 +38,32 @@ namespace TeleSharp.TL
         {
             this.Flags = br.ReadInt32();
             if ((this.Flags & 1) != 0)
+            {
                 this.FromId = br.ReadInt32();
+            }
             else
+            {
                 this.FromId = null;
+            }
 
             this.Date = br.ReadInt32();
             if ((this.Flags & 2) != 0)
+            {
                 this.ChannelId = br.ReadInt32();
+            }
             else
+            {
                 this.ChannelId = null;
+            }
 
             if ((this.Flags & 4) != 0)
+            {
                 this.ChannelPost = br.ReadInt32();
+            }
             else
+            {
                 this.ChannelPost = null;
-
-
+            }
         }
 
         public override void SerializeBody(BinaryWriter bw)
@@ -62,13 +72,20 @@ namespace TeleSharp.TL
             this.ComputeFlags();
             bw.Write(this.Flags);
             if ((this.Flags & 1) != 0)
+            {
                 bw.Write(this.FromId.Value);
+            }
+
             bw.Write(this.Date);
             if ((this.Flags & 2) != 0)
+            {
                 bw.Write(this.ChannelId.Value);
-            if ((this.Flags & 4) != 0)
-                bw.Write(this.ChannelPost.Value);
+            }
 
+            if ((this.Flags & 4) != 0)
+            {
+                bw.Write(this.ChannelPost.Value);
+            }
         }
     }
 }

@@ -35,11 +35,13 @@ namespace TeleSharp.TL
             this.Flags = br.ReadInt32();
             this.ChatId = br.ReadInt32();
             if ((this.Flags & 1) != 0)
+            {
                 this.SelfParticipant = (TLAbsChatParticipant)ObjectUtils.DeserializeObject(br);
+            }
             else
+            {
                 this.SelfParticipant = null;
-
-
+            }
         }
 
         public override void SerializeBody(BinaryWriter bw)
@@ -49,8 +51,9 @@ namespace TeleSharp.TL
             bw.Write(this.Flags);
             bw.Write(this.ChatId);
             if ((this.Flags & 1) != 0)
+            {
                 ObjectUtils.SerializeObject(this.SelfParticipant, bw);
-
+            }
         }
     }
 }

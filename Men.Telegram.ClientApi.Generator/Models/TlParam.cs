@@ -1,13 +1,13 @@
 ﻿using Newtonsoft.Json;
 
-namespace TeleSharp.Generator.Models
+namespace Men.Telegram.ClientApi.Generator.Models
 {
-    internal class TlParam
+    public class TlParam
     {
-        [JsonProperty("name")] 
+        [JsonProperty("name")]
         public string Name { get; set; }
 
-        [JsonProperty("type")] 
+        [JsonProperty("type")]
         public string Type { get; set; }
     }
 }

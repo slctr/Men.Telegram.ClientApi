@@ -45,21 +45,31 @@ namespace TeleSharp.TL.Messages
             this.Peer = (TLAbsInputPeer)ObjectUtils.DeserializeObject(br);
             this.Id = br.ReadInt32();
             if ((this.Flags & 2048) != 0)
+            {
                 this.Message = StringUtil.Deserialize(br);
+            }
             else
+            {
                 this.Message = null;
+            }
 
             if ((this.Flags & 4) != 0)
+            {
                 this.ReplyMarkup = (TLAbsReplyMarkup)ObjectUtils.DeserializeObject(br);
+            }
             else
+            {
                 this.ReplyMarkup = null;
+            }
 
             if ((this.Flags & 8) != 0)
+            {
                 this.Entities = (TLVector<TLAbsMessageEntity>)ObjectUtils.DeserializeVector<TLAbsMessageEntity>(br);
+            }
             else
+            {
                 this.Entities = null;
-
-
+            }
         }
 
         public override void SerializeBody(BinaryWriter bw)
@@ -71,12 +81,19 @@ namespace TeleSharp.TL.Messages
             ObjectUtils.SerializeObject(this.Peer, bw);
             bw.Write(this.Id);
             if ((this.Flags & 2048) != 0)
+            {
                 StringUtil.Serialize(this.Message, bw);
-            if ((this.Flags & 4) != 0)
-                ObjectUtils.SerializeObject(this.ReplyMarkup, bw);
-            if ((this.Flags & 8) != 0)
-                ObjectUtils.SerializeObject(this.Entities, bw);
+            }
 
+            if ((this.Flags & 4) != 0)
+            {
+                ObjectUtils.SerializeObject(this.ReplyMarkup, bw);
+            }
+
+            if ((this.Flags & 8) != 0)
+            {
+                ObjectUtils.SerializeObject(this.Entities, bw);
+            }
         }
         public override void DeserializeResponse(BinaryReader br)
         {

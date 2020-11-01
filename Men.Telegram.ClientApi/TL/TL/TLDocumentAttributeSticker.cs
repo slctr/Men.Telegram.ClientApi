@@ -40,11 +40,13 @@ namespace TeleSharp.TL
             this.Alt = StringUtil.Deserialize(br);
             this.Stickerset = (TLAbsInputStickerSet)ObjectUtils.DeserializeObject(br);
             if ((this.Flags & 1) != 0)
+            {
                 this.MaskCoords = (TLMaskCoords)ObjectUtils.DeserializeObject(br);
+            }
             else
+            {
                 this.MaskCoords = null;
-
-
+            }
         }
 
         public override void SerializeBody(BinaryWriter bw)
@@ -56,8 +58,9 @@ namespace TeleSharp.TL
             StringUtil.Serialize(this.Alt, bw);
             ObjectUtils.SerializeObject(this.Stickerset, bw);
             if ((this.Flags & 1) != 0)
+            {
                 ObjectUtils.SerializeObject(this.MaskCoords, bw);
-
+            }
         }
     }
 }

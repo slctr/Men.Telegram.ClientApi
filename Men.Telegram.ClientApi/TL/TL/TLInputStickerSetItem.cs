@@ -37,11 +37,13 @@ namespace TeleSharp.TL
             this.Document = (TLAbsInputDocument)ObjectUtils.DeserializeObject(br);
             this.Emoji = StringUtil.Deserialize(br);
             if ((this.Flags & 1) != 0)
+            {
                 this.MaskCoords = (TLMaskCoords)ObjectUtils.DeserializeObject(br);
+            }
             else
+            {
                 this.MaskCoords = null;
-
-
+            }
         }
 
         public override void SerializeBody(BinaryWriter bw)
@@ -52,8 +54,9 @@ namespace TeleSharp.TL
             ObjectUtils.SerializeObject(this.Document, bw);
             StringUtil.Serialize(this.Emoji, bw);
             if ((this.Flags & 1) != 0)
+            {
                 ObjectUtils.SerializeObject(this.MaskCoords, bw);
-
+            }
         }
     }
 }

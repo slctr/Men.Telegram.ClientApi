@@ -33,11 +33,13 @@ namespace TeleSharp.TL
         {
             this.Flags = br.ReadInt32();
             if ((this.Flags & 1) != 0)
+            {
                 this.Order = (TLVector<TLAbsPeer>)ObjectUtils.DeserializeVector<TLAbsPeer>(br);
+            }
             else
+            {
                 this.Order = null;
-
-
+            }
         }
 
         public override void SerializeBody(BinaryWriter bw)
@@ -46,8 +48,9 @@ namespace TeleSharp.TL
             this.ComputeFlags();
             bw.Write(this.Flags);
             if ((this.Flags & 1) != 0)
+            {
                 ObjectUtils.SerializeObject(this.Order, bw);
-
+            }
         }
     }
 }

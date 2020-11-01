@@ -34,9 +34,13 @@ namespace TeleSharp.TL.Auth
         {
             this.Flags = br.ReadInt32();
             if ((this.Flags & 1) != 0)
+            {
                 this.TmpSessions = br.ReadInt32();
+            }
             else
+            {
                 this.TmpSessions = null;
+            }
 
             this.User = (TLAbsUser)ObjectUtils.DeserializeObject(br);
 
@@ -48,7 +52,10 @@ namespace TeleSharp.TL.Auth
             this.ComputeFlags();
             bw.Write(this.Flags);
             if ((this.Flags & 1) != 0)
+            {
                 bw.Write(this.TmpSessions.Value);
+            }
+
             ObjectUtils.SerializeObject(this.User, bw);
 
         }

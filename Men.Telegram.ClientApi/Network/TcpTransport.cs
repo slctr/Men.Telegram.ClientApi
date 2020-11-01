@@ -20,8 +20,8 @@ namespace TLSharp.Core.Network
         {
             if (handler == null)
             {
-                var ipAddress = IPAddress.Parse(address);
-                var endpoint = new IPEndPoint(ipAddress, port);
+                IPAddress ipAddress = IPAddress.Parse(address);
+                IPEndPoint endpoint = new IPEndPoint(ipAddress, port);
 
                 this.tcpClient = new TcpClient(ipAddress.AddressFamily);
 
@@ -33,7 +33,9 @@ namespace TLSharp.Core.Network
                 }
             }
             else
+            {
                 this.tcpClient = handler(address, port);
+            }
 
             if (this.tcpClient.Connected)
             {
@@ -44,9 +46,11 @@ namespace TLSharp.Core.Network
         public async Task Send(byte[] packet, CancellationToken token = default(CancellationToken))
         {
             if (!this.tcpClient.Connected)
+            {
                 throw new InvalidOperationException("Client not connected to server.");
+            }
 
-            var tcpMessage = new TcpMessage(this.sendCounter, packet);
+            TcpMessage tcpMessage = new TcpMessage(this.sendCounter, packet);
 
             await this.stream.WriteAsync(tcpMessage.Encode(), 0, tcpMessage.Encode().Length, token).ConfigureAwait(false);
             this.sendCounter++;
@@ -54,41 +58,49 @@ namespace TLSharp.Core.Network
 
         public async Task<TcpMessage> Receive(CancellationToken token = default(CancellationToken))
         {
-            var packetLengthBytes = new byte[4];
+            byte[] packetLengthBytes = new byte[4];
             if (await this.stream.ReadAsync(packetLengthBytes, 0, 4, token).ConfigureAwait(false) != 4)
+            {
                 throw new InvalidOperationException("Couldn't read the packet length");
+            }
+
             int packetLength = BitConverter.ToInt32(packetLengthBytes, 0);
 
-            var seqBytes = new byte[4];
+            byte[] seqBytes = new byte[4];
             if (await this.stream.ReadAsync(seqBytes, 0, 4, token).ConfigureAwait(false) != 4)
+            {
                 throw new InvalidOperationException("Couldn't read the sequence");
+            }
+
             int seq = BitConverter.ToInt32(seqBytes, 0);
 
             int readBytes = 0;
-            var body = new byte[packetLength - 12];
+            byte[] body = new byte[packetLength - 12];
             int neededToRead = packetLength - 12;
 
             do
             {
-                var bodyByte = new byte[packetLength - 12];
-                var availableBytes = await this.stream.ReadAsync(bodyByte, 0, neededToRead, token).ConfigureAwait(false);
+                byte[] bodyByte = new byte[packetLength - 12];
+                int availableBytes = await this.stream.ReadAsync(bodyByte, 0, neededToRead, token).ConfigureAwait(false);
                 neededToRead -= availableBytes;
                 Buffer.BlockCopy(bodyByte, 0, body, readBytes, availableBytes);
                 readBytes += availableBytes;
             }
             while (readBytes != packetLength - 12);
 
-            var crcBytes = new byte[4];
+            byte[] crcBytes = new byte[4];
             if (await this.stream.ReadAsync(crcBytes, 0, 4, token).ConfigureAwait(false) != 4)
+            {
                 throw new InvalidOperationException("Couldn't read the crc");
+            }
 
             byte[] rv = new byte[packetLengthBytes.Length + seqBytes.Length + body.Length];
 
             Buffer.BlockCopy(packetLengthBytes, 0, rv, 0, packetLengthBytes.Length);
             Buffer.BlockCopy(seqBytes, 0, rv, packetLengthBytes.Length, seqBytes.Length);
             Buffer.BlockCopy(body, 0, rv, packetLengthBytes.Length + seqBytes.Length, body.Length);
-            var crc32 = new Crc32();
-            var computedChecksum = crc32.ComputeHash(rv).Reverse();
+            Crc32 crc32 = new Crc32();
+            System.Collections.Generic.IEnumerable<byte> computedChecksum = crc32.ComputeHash(rv).Reverse();
 
             if (!crcBytes.SequenceEqual(computedChecksum))
             {

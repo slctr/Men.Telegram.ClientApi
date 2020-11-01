@@ -69,54 +69,88 @@ namespace TeleSharp.TL
             this.Post = (this.Flags & 16384) != 0;
             this.Id = br.ReadInt32();
             if ((this.Flags & 256) != 0)
+            {
                 this.FromId = br.ReadInt32();
+            }
             else
+            {
                 this.FromId = null;
+            }
 
             this.ToId = (TLAbsPeer)ObjectUtils.DeserializeObject(br);
             if ((this.Flags & 4) != 0)
+            {
                 this.FwdFrom = (TLMessageFwdHeader)ObjectUtils.DeserializeObject(br);
+            }
             else
+            {
                 this.FwdFrom = null;
+            }
 
             if ((this.Flags & 2048) != 0)
+            {
                 this.ViaBotId = br.ReadInt32();
+            }
             else
+            {
                 this.ViaBotId = null;
+            }
 
             if ((this.Flags & 8) != 0)
+            {
                 this.ReplyToMsgId = br.ReadInt32();
+            }
             else
+            {
                 this.ReplyToMsgId = null;
+            }
 
             this.Date = br.ReadInt32();
             this.Message = StringUtil.Deserialize(br);
             if ((this.Flags & 512) != 0)
+            {
                 this.Media = (TLAbsMessageMedia)ObjectUtils.DeserializeObject(br);
+            }
             else
+            {
                 this.Media = null;
+            }
 
             if ((this.Flags & 64) != 0)
+            {
                 this.ReplyMarkup = (TLAbsReplyMarkup)ObjectUtils.DeserializeObject(br);
+            }
             else
+            {
                 this.ReplyMarkup = null;
+            }
 
             if ((this.Flags & 128) != 0)
+            {
                 this.Entities = (TLVector<TLAbsMessageEntity>)ObjectUtils.DeserializeVector<TLAbsMessageEntity>(br);
+            }
             else
+            {
                 this.Entities = null;
+            }
 
             if ((this.Flags & 1024) != 0)
+            {
                 this.Views = br.ReadInt32();
+            }
             else
+            {
                 this.Views = null;
+            }
 
             if ((this.Flags & 32768) != 0)
+            {
                 this.EditDate = br.ReadInt32();
+            }
             else
+            {
                 this.EditDate = null;
-
-
+            }
         }
 
         public override void SerializeBody(BinaryWriter bw)
@@ -131,27 +165,52 @@ namespace TeleSharp.TL
 
             bw.Write(this.Id);
             if ((this.Flags & 256) != 0)
+            {
                 bw.Write(this.FromId.Value);
+            }
+
             ObjectUtils.SerializeObject(this.ToId, bw);
             if ((this.Flags & 4) != 0)
+            {
                 ObjectUtils.SerializeObject(this.FwdFrom, bw);
+            }
+
             if ((this.Flags & 2048) != 0)
+            {
                 bw.Write(this.ViaBotId.Value);
+            }
+
             if ((this.Flags & 8) != 0)
+            {
                 bw.Write(this.ReplyToMsgId.Value);
+            }
+
             bw.Write(this.Date);
             StringUtil.Serialize(this.Message, bw);
             if ((this.Flags & 512) != 0)
+            {
                 ObjectUtils.SerializeObject(this.Media, bw);
-            if ((this.Flags & 64) != 0)
-                ObjectUtils.SerializeObject(this.ReplyMarkup, bw);
-            if ((this.Flags & 128) != 0)
-                ObjectUtils.SerializeObject(this.Entities, bw);
-            if ((this.Flags & 1024) != 0)
-                bw.Write(this.Views.Value);
-            if ((this.Flags & 32768) != 0)
-                bw.Write(this.EditDate.Value);
+            }
 
+            if ((this.Flags & 64) != 0)
+            {
+                ObjectUtils.SerializeObject(this.ReplyMarkup, bw);
+            }
+
+            if ((this.Flags & 128) != 0)
+            {
+                ObjectUtils.SerializeObject(this.Entities, bw);
+            }
+
+            if ((this.Flags & 1024) != 0)
+            {
+                bw.Write(this.Views.Value);
+            }
+
+            if ((this.Flags & 32768) != 0)
+            {
+                bw.Write(this.EditDate.Value);
+            }
         }
     }
 }

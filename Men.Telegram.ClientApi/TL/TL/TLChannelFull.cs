@@ -60,19 +60,31 @@ namespace TeleSharp.TL
             this.Id = br.ReadInt32();
             this.About = StringUtil.Deserialize(br);
             if ((this.Flags & 1) != 0)
+            {
                 this.ParticipantsCount = br.ReadInt32();
+            }
             else
+            {
                 this.ParticipantsCount = null;
+            }
 
             if ((this.Flags & 2) != 0)
+            {
                 this.AdminsCount = br.ReadInt32();
+            }
             else
+            {
                 this.AdminsCount = null;
+            }
 
             if ((this.Flags & 4) != 0)
+            {
                 this.KickedCount = br.ReadInt32();
+            }
             else
+            {
                 this.KickedCount = null;
+            }
 
             this.ReadInboxMaxId = br.ReadInt32();
             this.ReadOutboxMaxId = br.ReadInt32();
@@ -82,21 +94,31 @@ namespace TeleSharp.TL
             this.ExportedInvite = (TLAbsExportedChatInvite)ObjectUtils.DeserializeObject(br);
             this.BotInfo = (TLVector<TLBotInfo>)ObjectUtils.DeserializeVector<TLBotInfo>(br);
             if ((this.Flags & 16) != 0)
+            {
                 this.MigratedFromChatId = br.ReadInt32();
+            }
             else
+            {
                 this.MigratedFromChatId = null;
+            }
 
             if ((this.Flags & 16) != 0)
+            {
                 this.MigratedFromMaxId = br.ReadInt32();
+            }
             else
+            {
                 this.MigratedFromMaxId = null;
+            }
 
             if ((this.Flags & 32) != 0)
+            {
                 this.PinnedMsgId = br.ReadInt32();
+            }
             else
+            {
                 this.PinnedMsgId = null;
-
-
+            }
         }
 
         public override void SerializeBody(BinaryWriter bw)
@@ -109,11 +131,20 @@ namespace TeleSharp.TL
             bw.Write(this.Id);
             StringUtil.Serialize(this.About, bw);
             if ((this.Flags & 1) != 0)
+            {
                 bw.Write(this.ParticipantsCount.Value);
+            }
+
             if ((this.Flags & 2) != 0)
+            {
                 bw.Write(this.AdminsCount.Value);
+            }
+
             if ((this.Flags & 4) != 0)
+            {
                 bw.Write(this.KickedCount.Value);
+            }
+
             bw.Write(this.ReadInboxMaxId);
             bw.Write(this.ReadOutboxMaxId);
             bw.Write(this.UnreadCount);
@@ -122,12 +153,19 @@ namespace TeleSharp.TL
             ObjectUtils.SerializeObject(this.ExportedInvite, bw);
             ObjectUtils.SerializeObject(this.BotInfo, bw);
             if ((this.Flags & 16) != 0)
+            {
                 bw.Write(this.MigratedFromChatId.Value);
-            if ((this.Flags & 16) != 0)
-                bw.Write(this.MigratedFromMaxId.Value);
-            if ((this.Flags & 32) != 0)
-                bw.Write(this.PinnedMsgId.Value);
+            }
 
+            if ((this.Flags & 16) != 0)
+            {
+                bw.Write(this.MigratedFromMaxId.Value);
+            }
+
+            if ((this.Flags & 32) != 0)
+            {
+                bw.Write(this.PinnedMsgId.Value);
+            }
         }
     }
 }

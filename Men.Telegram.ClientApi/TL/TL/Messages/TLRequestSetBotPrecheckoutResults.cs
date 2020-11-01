@@ -39,11 +39,13 @@ namespace TeleSharp.TL.Messages
             this.Success = (this.Flags & 2) != 0;
             this.QueryId = br.ReadInt64();
             if ((this.Flags & 1) != 0)
+            {
                 this.Error = StringUtil.Deserialize(br);
+            }
             else
+            {
                 this.Error = null;
-
-
+            }
         }
 
         public override void SerializeBody(BinaryWriter bw)
@@ -54,8 +56,9 @@ namespace TeleSharp.TL.Messages
 
             bw.Write(this.QueryId);
             if ((this.Flags & 1) != 0)
+            {
                 StringUtil.Serialize(this.Error, bw);
-
+            }
         }
         public override void DeserializeResponse(BinaryReader br)
         {

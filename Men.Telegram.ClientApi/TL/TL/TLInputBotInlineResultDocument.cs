@@ -41,14 +41,22 @@ namespace TeleSharp.TL
             this.Id = StringUtil.Deserialize(br);
             this.Type = StringUtil.Deserialize(br);
             if ((this.Flags & 2) != 0)
+            {
                 this.Title = StringUtil.Deserialize(br);
+            }
             else
+            {
                 this.Title = null;
+            }
 
             if ((this.Flags & 4) != 0)
+            {
                 this.Description = StringUtil.Deserialize(br);
+            }
             else
+            {
                 this.Description = null;
+            }
 
             this.Document = (TLAbsInputDocument)ObjectUtils.DeserializeObject(br);
             this.SendMessage = (TLAbsInputBotInlineMessage)ObjectUtils.DeserializeObject(br);
@@ -63,9 +71,15 @@ namespace TeleSharp.TL
             StringUtil.Serialize(this.Id, bw);
             StringUtil.Serialize(this.Type, bw);
             if ((this.Flags & 2) != 0)
+            {
                 StringUtil.Serialize(this.Title, bw);
+            }
+
             if ((this.Flags & 4) != 0)
+            {
                 StringUtil.Serialize(this.Description, bw);
+            }
+
             ObjectUtils.SerializeObject(this.Document, bw);
             ObjectUtils.SerializeObject(this.SendMessage, bw);
 

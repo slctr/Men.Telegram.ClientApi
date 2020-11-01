@@ -43,11 +43,13 @@ namespace TeleSharp.TL
             this.Provider = StringUtil.Deserialize(br);
             this.VenueId = StringUtil.Deserialize(br);
             if ((this.Flags & 4) != 0)
+            {
                 this.ReplyMarkup = (TLAbsReplyMarkup)ObjectUtils.DeserializeObject(br);
+            }
             else
+            {
                 this.ReplyMarkup = null;
-
-
+            }
         }
 
         public override void SerializeBody(BinaryWriter bw)
@@ -61,8 +63,9 @@ namespace TeleSharp.TL
             StringUtil.Serialize(this.Provider, bw);
             StringUtil.Serialize(this.VenueId, bw);
             if ((this.Flags & 4) != 0)
+            {
                 ObjectUtils.SerializeObject(this.ReplyMarkup, bw);
-
+            }
         }
     }
 }

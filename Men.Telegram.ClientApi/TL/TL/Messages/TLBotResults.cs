@@ -42,14 +42,22 @@ namespace TeleSharp.TL.Messages
             this.Gallery = (this.Flags & 1) != 0;
             this.QueryId = br.ReadInt64();
             if ((this.Flags & 2) != 0)
+            {
                 this.NextOffset = StringUtil.Deserialize(br);
+            }
             else
+            {
                 this.NextOffset = null;
+            }
 
             if ((this.Flags & 4) != 0)
+            {
                 this.SwitchPm = (TLInlineBotSwitchPM)ObjectUtils.DeserializeObject(br);
+            }
             else
+            {
                 this.SwitchPm = null;
+            }
 
             this.Results = (TLVector<TLAbsBotInlineResult>)ObjectUtils.DeserializeVector<TLAbsBotInlineResult>(br);
             this.CacheTime = br.ReadInt32();
@@ -64,9 +72,15 @@ namespace TeleSharp.TL.Messages
 
             bw.Write(this.QueryId);
             if ((this.Flags & 2) != 0)
+            {
                 StringUtil.Serialize(this.NextOffset, bw);
+            }
+
             if ((this.Flags & 4) != 0)
+            {
                 ObjectUtils.SerializeObject(this.SwitchPm, bw);
+            }
+
             ObjectUtils.SerializeObject(this.Results, bw);
             bw.Write(this.CacheTime);
 

@@ -55,15 +55,23 @@ namespace TeleSharp.TL
             this.Post = (this.Flags & 16384) != 0;
             this.Id = br.ReadInt32();
             if ((this.Flags & 256) != 0)
+            {
                 this.FromId = br.ReadInt32();
+            }
             else
+            {
                 this.FromId = null;
+            }
 
             this.ToId = (TLAbsPeer)ObjectUtils.DeserializeObject(br);
             if ((this.Flags & 8) != 0)
+            {
                 this.ReplyToMsgId = br.ReadInt32();
+            }
             else
+            {
                 this.ReplyToMsgId = null;
+            }
 
             this.Date = br.ReadInt32();
             this.Action = (TLAbsMessageAction)ObjectUtils.DeserializeObject(br);
@@ -82,10 +90,16 @@ namespace TeleSharp.TL
 
             bw.Write(this.Id);
             if ((this.Flags & 256) != 0)
+            {
                 bw.Write(this.FromId.Value);
+            }
+
             ObjectUtils.SerializeObject(this.ToId, bw);
             if ((this.Flags & 8) != 0)
+            {
                 bw.Write(this.ReplyToMsgId.Value);
+            }
+
             bw.Write(this.Date);
             ObjectUtils.SerializeObject(this.Action, bw);
 

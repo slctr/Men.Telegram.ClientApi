@@ -54,24 +54,40 @@ namespace TeleSharp.TL.Payments
             this.ProviderId = br.ReadInt32();
             this.Url = StringUtil.Deserialize(br);
             if ((this.Flags & 16) != 0)
+            {
                 this.NativeProvider = StringUtil.Deserialize(br);
+            }
             else
+            {
                 this.NativeProvider = null;
+            }
 
             if ((this.Flags & 16) != 0)
+            {
                 this.NativeParams = (TLDataJSON)ObjectUtils.DeserializeObject(br);
+            }
             else
+            {
                 this.NativeParams = null;
+            }
 
             if ((this.Flags & 1) != 0)
+            {
                 this.SavedInfo = (TLPaymentRequestedInfo)ObjectUtils.DeserializeObject(br);
+            }
             else
+            {
                 this.SavedInfo = null;
+            }
 
             if ((this.Flags & 2) != 0)
+            {
                 this.SavedCredentials = (TLPaymentSavedCredentialsCard)ObjectUtils.DeserializeObject(br);
+            }
             else
+            {
                 this.SavedCredentials = null;
+            }
 
             this.Users = (TLVector<TLAbsUser>)ObjectUtils.DeserializeVector<TLAbsUser>(br);
 
@@ -89,13 +105,25 @@ namespace TeleSharp.TL.Payments
             bw.Write(this.ProviderId);
             StringUtil.Serialize(this.Url, bw);
             if ((this.Flags & 16) != 0)
+            {
                 StringUtil.Serialize(this.NativeProvider, bw);
+            }
+
             if ((this.Flags & 16) != 0)
+            {
                 ObjectUtils.SerializeObject(this.NativeParams, bw);
+            }
+
             if ((this.Flags & 1) != 0)
+            {
                 ObjectUtils.SerializeObject(this.SavedInfo, bw);
+            }
+
             if ((this.Flags & 2) != 0)
+            {
                 ObjectUtils.SerializeObject(this.SavedCredentials, bw);
+            }
+
             ObjectUtils.SerializeObject(this.Users, bw);
 
         }

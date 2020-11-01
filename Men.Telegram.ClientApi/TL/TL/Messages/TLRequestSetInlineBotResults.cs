@@ -48,16 +48,22 @@ namespace TeleSharp.TL.Messages
             this.Results = (TLVector<TLAbsInputBotInlineResult>)ObjectUtils.DeserializeVector<TLAbsInputBotInlineResult>(br);
             this.CacheTime = br.ReadInt32();
             if ((this.Flags & 4) != 0)
+            {
                 this.NextOffset = StringUtil.Deserialize(br);
+            }
             else
+            {
                 this.NextOffset = null;
+            }
 
             if ((this.Flags & 8) != 0)
+            {
                 this.SwitchPm = (TLInlineBotSwitchPM)ObjectUtils.DeserializeObject(br);
+            }
             else
+            {
                 this.SwitchPm = null;
-
-
+            }
         }
 
         public override void SerializeBody(BinaryWriter bw)
@@ -71,10 +77,14 @@ namespace TeleSharp.TL.Messages
             ObjectUtils.SerializeObject(this.Results, bw);
             bw.Write(this.CacheTime);
             if ((this.Flags & 4) != 0)
+            {
                 StringUtil.Serialize(this.NextOffset, bw);
-            if ((this.Flags & 8) != 0)
-                ObjectUtils.SerializeObject(this.SwitchPm, bw);
+            }
 
+            if ((this.Flags & 8) != 0)
+            {
+                ObjectUtils.SerializeObject(this.SwitchPm, bw);
+            }
         }
         public override void DeserializeResponse(BinaryReader br)
         {

@@ -42,14 +42,22 @@ namespace TeleSharp.TL
             this.TotalAmount = br.ReadInt64();
             this.Payload = BytesUtil.Deserialize(br);
             if ((this.Flags & 1) != 0)
+            {
                 this.Info = (TLPaymentRequestedInfo)ObjectUtils.DeserializeObject(br);
+            }
             else
+            {
                 this.Info = null;
+            }
 
             if ((this.Flags & 2) != 0)
+            {
                 this.ShippingOptionId = StringUtil.Deserialize(br);
+            }
             else
+            {
                 this.ShippingOptionId = null;
+            }
 
             this.Charge = (TLPaymentCharge)ObjectUtils.DeserializeObject(br);
 
@@ -64,9 +72,15 @@ namespace TeleSharp.TL
             bw.Write(this.TotalAmount);
             BytesUtil.Serialize(this.Payload, bw);
             if ((this.Flags & 1) != 0)
+            {
                 ObjectUtils.SerializeObject(this.Info, bw);
+            }
+
             if ((this.Flags & 2) != 0)
+            {
                 StringUtil.Serialize(this.ShippingOptionId, bw);
+            }
+
             ObjectUtils.SerializeObject(this.Charge, bw);
 
         }

@@ -5,10 +5,10 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-
+using Men.Telegram.ClientApi;
+using Men.Telegram.ClientApi.Models;
 using TeleSharp.TL;
 using TeleSharp.TL.Messages;
-using TLSharp.Core;
 using TLSharp.Core.Exceptions;
 using TLSharp.Core.Network.Exceptions;
 using TLSharp.Core.Utils;
@@ -66,7 +66,8 @@ namespace TLSharp.Tests
         {
             try
             {
-                return new TelegramClient(this.ApiId, this.ApiHash);
+                TelegramClient telegramClient = new TelegramClient();
+                return telegramClient;
             }
             catch (MissingApiConfigurationException ex)
             {
@@ -81,51 +82,76 @@ namespace TLSharp.Tests
 
             this.ApiHash = ConfigurationManager.AppSettings[nameof(this.ApiHash)];
             if (string.IsNullOrEmpty(this.ApiHash))
+            {
                 Debug.WriteLine(appConfigMsgWarning, nameof(this.ApiHash));
+            }
 
-            var apiId = ConfigurationManager.AppSettings[nameof(this.ApiId)];
+            string apiId = ConfigurationManager.AppSettings[nameof(this.ApiId)];
             if (string.IsNullOrEmpty(apiId))
+            {
                 Debug.WriteLine(appConfigMsgWarning, nameof(this.ApiId));
+            }
             else
+            {
                 this.ApiId = int.Parse(apiId);
+            }
 
             this.NumberToAuthenticate = ConfigurationManager.AppSettings[nameof(this.NumberToAuthenticate)];
             if (string.IsNullOrEmpty(this.NumberToAuthenticate))
+            {
                 Debug.WriteLine(appConfigMsgWarning, nameof(this.NumberToAuthenticate));
+            }
 
             this.CodeToAuthenticate = ConfigurationManager.AppSettings[nameof(this.CodeToAuthenticate)];
             if (string.IsNullOrEmpty(this.CodeToAuthenticate))
+            {
                 Debug.WriteLine(appConfigMsgWarning, nameof(this.CodeToAuthenticate));
+            }
 
             this.PasswordToAuthenticate = ConfigurationManager.AppSettings[nameof(this.PasswordToAuthenticate)];
             if (string.IsNullOrEmpty(this.PasswordToAuthenticate))
+            {
                 Debug.WriteLine(appConfigMsgWarning, nameof(this.PasswordToAuthenticate));
+            }
 
             this.NotRegisteredNumberToSignUp = ConfigurationManager.AppSettings[nameof(this.NotRegisteredNumberToSignUp)];
             if (string.IsNullOrEmpty(this.NotRegisteredNumberToSignUp))
+            {
                 Debug.WriteLine(appConfigMsgWarning, nameof(this.NotRegisteredNumberToSignUp));
+            }
 
             this.UserNameToSendMessage = ConfigurationManager.AppSettings[nameof(this.UserNameToSendMessage)];
             if (string.IsNullOrEmpty(this.UserNameToSendMessage))
+            {
                 Debug.WriteLine(appConfigMsgWarning, nameof(this.UserNameToSendMessage));
+            }
 
             this.NumberToGetUserFull = ConfigurationManager.AppSettings[nameof(this.NumberToGetUserFull)];
             if (string.IsNullOrEmpty(this.NumberToGetUserFull))
+            {
                 Debug.WriteLine(appConfigMsgWarning, nameof(this.NumberToGetUserFull));
+            }
 
             this.NumberToAddToChat = ConfigurationManager.AppSettings[nameof(this.NumberToAddToChat)];
             if (string.IsNullOrEmpty(this.NumberToAddToChat))
+            {
                 Debug.WriteLine(appConfigMsgWarning, nameof(this.NumberToAddToChat));
+            }
         }
 
         public virtual async Task AuthUser()
         {
-            var client = this.NewClient();
+            TelegramClient client = this.NewClient();
 
-            await client.ConnectAsync();
+            TelegramAuthModel authModel = new TelegramAuthModel()
+            {
+                ApiId = this.ApiId,
+                ApiHash = this.ApiHash
+            };
+            await client.AuthenticateAsync(authModel);
 
-            var hash = await client.SendCodeRequestAsync(this.NumberToAuthenticate);
-            var code = this.CodeToAuthenticate; // you can change code in debugger too
+            string hash = await client.SendCodeRequestAsync(this.NumberToAuthenticate);
+            string code = this.CodeToAuthenticate; // you can change code in debugger too
 
             if (String.IsNullOrWhiteSpace(code))
             {
@@ -139,8 +165,8 @@ namespace TLSharp.Tests
             }
             catch (CloudPasswordNeededException ex)
             {
-                var passwordSetting = await client.GetPasswordSetting();
-                var password = this.PasswordToAuthenticate;
+                TeleSharp.TL.Account.TLPassword passwordSetting = await client.GetPasswordSetting();
+                string password = this.PasswordToAuthenticate;
 
                 user = await client.MakeAuthWithPasswordAsync(passwordSetting, password);
             }
@@ -157,20 +183,27 @@ namespace TLSharp.Tests
         {
             this.NumberToSendMessage = ConfigurationManager.AppSettings[nameof(this.NumberToSendMessage)];
             if (string.IsNullOrWhiteSpace(this.NumberToSendMessage))
+            {
                 throw new Exception($"Please fill the '{nameof(this.NumberToSendMessage)}' setting in app.config file first");
+            }
 
             // this is because the contacts in the address come without the "+" prefix
-            var normalizedNumber = this.NumberToSendMessage.StartsWith("+") ?
+            string normalizedNumber = this.NumberToSendMessage.StartsWith("+") ?
                 this.NumberToSendMessage.Substring(1, this.NumberToSendMessage.Length - 1) :
                 this.NumberToSendMessage;
 
-            var client = this.NewClient();
+            TelegramClient client = this.NewClient();
 
-            await client.ConnectAsync();
+            TelegramAuthModel authModel = new TelegramAuthModel()
+            {
+                ApiId = this.ApiId,
+                ApiHash = this.ApiHash
+            };
+            await client.AuthenticateAsync(authModel);
 
-            var result = await client.GetContactsAsync();
+            TeleSharp.TL.Contacts.TLContacts result = await client.GetContactsAsync();
 
-            var user = result.Users
+            TLUser user = result.Users
                 .OfType<TLUser>()
                 .FirstOrDefault(x => x.Phone == normalizedNumber);
 
@@ -186,12 +219,17 @@ namespace TLSharp.Tests
 
         public virtual async Task SendMessageToChannelTest()
         {
-            var client = this.NewClient();
+            TelegramClient client = this.NewClient();
 
-            await client.ConnectAsync();
+            TelegramAuthModel authModel = new TelegramAuthModel()
+            {
+                ApiId = this.ApiId,
+                ApiHash = this.ApiHash
+            };
+            await client.AuthenticateAsync(authModel);
 
-            var dialogs = (TLDialogs)await client.GetUserDialogsAsync();
-            var chat = dialogs.Chats
+            TLDialogs dialogs = (TLDialogs)await client.GetUserDialogsAsync();
+            TLChannel chat = dialogs.Chats
                 .OfType<TLChannel>()
                 .FirstOrDefault(c => c.Title == "TestGroup");
 
@@ -200,33 +238,43 @@ namespace TLSharp.Tests
 
         public virtual async Task SendPhotoToContactTest()
         {
-            var client = this.NewClient();
+            TelegramClient client = this.NewClient();
 
-            await client.ConnectAsync();
+            TelegramAuthModel authModel = new TelegramAuthModel()
+            {
+                ApiId = this.ApiId,
+                ApiHash = this.ApiHash
+            };
+            await client.AuthenticateAsync(authModel);
 
-            var result = await client.GetContactsAsync();
+            TeleSharp.TL.Contacts.TLContacts result = await client.GetContactsAsync();
 
-            var user = result.Users
+            TLUser user = result.Users
                 .OfType<TLUser>()
                 .FirstOrDefault(x => x.Phone == this.NumberToSendMessage);
 
-            var fileResult = (TLInputFile)await client.UploadFile("cat.jpg", new StreamReader("data/cat.jpg"));
+            TLInputFile fileResult = (TLInputFile)await client.UploadFile("cat.jpg", new StreamReader("data/cat.jpg"));
             await client.SendUploadedPhoto(new TLInputPeerUser() { UserId = user.Id }, fileResult, "kitty");
         }
 
         public virtual async Task SendBigFileToContactTest()
         {
-            var client = this.NewClient();
+            TelegramClient client = this.NewClient();
 
-            await client.ConnectAsync();
+            TelegramAuthModel authModel = new TelegramAuthModel()
+            {
+                ApiId = this.ApiId,
+                ApiHash = this.ApiHash
+            };
+            await client.AuthenticateAsync(authModel);
 
-            var result = await client.GetContactsAsync();
+            TeleSharp.TL.Contacts.TLContacts result = await client.GetContactsAsync();
 
-            var user = result.Users
+            TLUser user = result.Users
                 .OfType<TLUser>()
                 .FirstOrDefault(x => x.Phone == this.NumberToSendMessage);
 
-            var fileResult = (TLInputFileBig)await client.UploadFile("some.zip", new StreamReader("<some big file path>"));
+            TLInputFileBig fileResult = (TLInputFileBig)await client.UploadFile("some.zip", new StreamReader("<some big file path>"));
 
             await client.SendUploadedDocument(
                 new TLInputPeerUser() { UserId = user.Id },
@@ -238,19 +286,24 @@ namespace TLSharp.Tests
 
         public virtual async Task DownloadFileFromContactTest()
         {
-            var client = this.NewClient();
+            TelegramClient client = this.NewClient();
 
-            await client.ConnectAsync();
+            TelegramAuthModel authModel = new TelegramAuthModel()
+            {
+                ApiId = this.ApiId,
+                ApiHash = this.ApiHash
+            };
+            await client.AuthenticateAsync(authModel);
 
-            var result = await client.GetContactsAsync();
+            TeleSharp.TL.Contacts.TLContacts result = await client.GetContactsAsync();
 
-            var user = result.Users
+            TLUser user = result.Users
                 .OfType<TLUser>()
                 .FirstOrDefault(x => x.Phone == this.NumberToSendMessage);
 
-            var inputPeer = new TLInputPeerUser() { UserId = user.Id };
-            var res = await client.SendRequestAsync<TLMessagesSlice>(new TLRequestGetHistory() { Peer = inputPeer });
-            var document = res.Messages
+            TLInputPeerUser inputPeer = new TLInputPeerUser() { UserId = user.Id };
+            TLMessagesSlice res = await client.SendRequestAsync<TLMessagesSlice>(new TLRequestGetHistory() { Peer = inputPeer });
+            TLDocument document = res.Messages
                 .OfType<TLMessage>()
                 .Where(m => m.Media != null)
                 .Select(m => m.Media)
@@ -259,7 +312,7 @@ namespace TLSharp.Tests
                 .OfType<TLDocument>()
                 .First();
 
-            var resFile = await client.GetFile(
+            TeleSharp.TL.Upload.TLFile resFile = await client.GetFile(
                 new TLInputDocumentFileLocation()
                 {
                     AccessHash = document.AccessHash,
@@ -273,53 +326,68 @@ namespace TLSharp.Tests
 
         public virtual async Task DownloadFileFromWrongLocationTest()
         {
-            var client = this.NewClient();
+            TelegramClient client = this.NewClient();
 
-            await client.ConnectAsync();
+            TelegramAuthModel authModel = new TelegramAuthModel()
+            {
+                ApiId = this.ApiId,
+                ApiHash = this.ApiHash
+            };
+            await client.AuthenticateAsync(authModel);
 
-            var result = await client.GetContactsAsync();
+            TeleSharp.TL.Contacts.TLContacts result = await client.GetContactsAsync();
 
-            var user = result.Users
+            TLUser user = result.Users
                 .OfType<TLUser>()
                 .FirstOrDefault(x => x.Id == 5880094);
 
-            var photo = ((TLUserProfilePhoto)user.Photo);
-            var photoLocation = (TLFileLocation)photo.PhotoBig;
+            TLUserProfilePhoto photo = ((TLUserProfilePhoto)user.Photo);
+            TLFileLocation photoLocation = (TLFileLocation)photo.PhotoBig;
 
-            var resFile = await client.GetFile(new TLInputFileLocation()
+            TeleSharp.TL.Upload.TLFile resFile = await client.GetFile(new TLInputFileLocation()
             {
                 LocalId = photoLocation.LocalId,
                 Secret = photoLocation.Secret,
                 VolumeId = photoLocation.VolumeId
             }, 1024);
 
-            var res = await client.GetUserDialogsAsync();
+            TLAbsDialogs res = await client.GetUserDialogsAsync();
 
             Assert.IsTrue(resFile.Bytes.Length > 0);
         }
 
         public virtual async Task SignUpNewUser()
         {
-            var client = this.NewClient();
-            await client.ConnectAsync();
+            TelegramClient client = this.NewClient();
+            TelegramAuthModel authModel = new TelegramAuthModel()
+            {
+                ApiId = this.ApiId,
+                ApiHash = this.ApiHash
+            };
+            await client.AuthenticateAsync(authModel);
 
-            var hash = await client.SendCodeRequestAsync(this.NotRegisteredNumberToSignUp);
-            var code = "";
+            string hash = await client.SendCodeRequestAsync(this.NotRegisteredNumberToSignUp);
+            string code = "";
 
-            var registeredUser = await client.SignUpAsync(this.NotRegisteredNumberToSignUp, hash, code, "TLSharp", "User");
+            TLUser registeredUser = await client.SignUpAsync(this.NotRegisteredNumberToSignUp, hash, code, "TLSharp", "User");
             Assert.IsNotNull(registeredUser);
             Assert.IsTrue(client.IsUserAuthorized());
 
-            var loggedInUser = await client.MakeAuthAsync(this.NotRegisteredNumberToSignUp, hash, code);
+            TLUser loggedInUser = await client.MakeAuthAsync(this.NotRegisteredNumberToSignUp, hash, code);
             Assert.IsNotNull(loggedInUser);
         }
 
         public virtual async Task CheckPhones()
         {
-            var client = this.NewClient();
-            await client.ConnectAsync();
+            TelegramClient client = this.NewClient();
+            TelegramAuthModel authModel = new TelegramAuthModel()
+            {
+                ApiId = this.ApiId,
+                ApiHash = this.ApiHash
+            };
+            await client.AuthenticateAsync(authModel);
 
-            var result = await client.IsPhoneRegisteredAsync(this.NumberToAuthenticate);
+            bool result = await client.IsPhoneRegisteredAsync(this.NumberToAuthenticate);
             Assert.IsTrue(result);
         }
 
@@ -343,22 +411,29 @@ namespace TLSharp.Tests
         {
             this.UserNameToSendMessage = ConfigurationManager.AppSettings[nameof(this.UserNameToSendMessage)];
             if (string.IsNullOrWhiteSpace(this.UserNameToSendMessage))
+            {
                 throw new Exception($"Please fill the '{nameof(this.UserNameToSendMessage)}' setting in app.config file first");
+            }
 
-            var client = this.NewClient();
+            TelegramClient client = this.NewClient();
 
-            await client.ConnectAsync();
+            TelegramAuthModel authModel = new TelegramAuthModel()
+            {
+                ApiId = this.ApiId,
+                ApiHash = this.ApiHash
+            };
+            await client.AuthenticateAsync(authModel);
 
-            var result = await client.SearchUserAsync(this.UserNameToSendMessage);
+            TeleSharp.TL.Contacts.TLFound result = await client.SearchUserAsync(this.UserNameToSendMessage);
 
-            var user = result.Users
+            TLUser user = result.Users
                 .Where(x => x.GetType() == typeof(TLUser))
                 .OfType<TLUser>()
                 .FirstOrDefault(x => x.Username == this.UserNameToSendMessage.TrimStart('@'));
 
             if (user == null)
             {
-                var contacts = await client.GetContactsAsync();
+                TeleSharp.TL.Contacts.TLContacts contacts = await client.GetContactsAsync();
 
                 user = contacts.Users
                     .Where(x => x.GetType() == typeof(TLUser))

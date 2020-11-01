@@ -29,9 +29,9 @@ namespace TLSharp.Core.Auth
             new Random().NextBytes(this.nonce);
             const int constructorNumber = 0x60469778;
 
-            using (var memoryStream = new MemoryStream())
+            using (MemoryStream memoryStream = new MemoryStream())
             {
-                using (var binaryWriter = new BinaryWriter(memoryStream))
+                using (BinaryWriter binaryWriter = new BinaryWriter(memoryStream))
                 {
                     binaryWriter.Write(constructorNumber);
                     binaryWriter.Write(this.nonce);
@@ -43,40 +43,40 @@ namespace TLSharp.Core.Auth
 
         public Step1_Response FromBytes(byte[] bytes)
         {
-            var fingerprints = new List<byte[]>();
+            List<byte[]> fingerprints = new List<byte[]>();
 
-            using (var memoryStream = new MemoryStream(bytes, false))
+            using (MemoryStream memoryStream = new MemoryStream(bytes, false))
             {
-                using (var binaryReader = new BinaryReader(memoryStream))
+                using (BinaryReader binaryReader = new BinaryReader(memoryStream))
                 {
                     const int responseConstructorNumber = 0x05162463;
-                    var responseCode = binaryReader.ReadInt32();
+                    int responseCode = binaryReader.ReadInt32();
                     if (responseCode != responseConstructorNumber)
                     {
                         throw new InvalidOperationException($"invalid response code: {responseCode}");
                     }
 
-                    var nonceFromServer = binaryReader.ReadBytes(16);
+                    byte[] nonceFromServer = binaryReader.ReadBytes(16);
 
                     if (!nonceFromServer.SequenceEqual(this.nonce))
                     {
                         throw new InvalidOperationException("invalid nonce from server");
                     }
 
-                    var serverNonce = binaryReader.ReadBytes(16);
+                    byte[] serverNonce = binaryReader.ReadBytes(16);
 
                     byte[] pqbytes = Serializers.Bytes.Read(binaryReader);
-                    var pq = new BigInteger(1, pqbytes);
+                    BigInteger pq = new BigInteger(1, pqbytes);
 
-                    var vectorId = binaryReader.ReadInt32();
+                    int vectorId = binaryReader.ReadInt32();
                     const int vectorConstructorNumber = 0x1cb5c415;
                     if (vectorId != vectorConstructorNumber)
                     {
                         throw new InvalidOperationException($"Invalid vector constructor number {vectorId}");
                     }
 
-                    var fingerprintCount = binaryReader.ReadInt32();
-                    for (var i = 0; i < fingerprintCount; i++)
+                    int fingerprintCount = binaryReader.ReadInt32();
+                    for (int i = 0; i < fingerprintCount; i++)
                     {
                         byte[] fingerprint = binaryReader.ReadBytes(8);
                         fingerprints.Add(fingerprint);

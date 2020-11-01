@@ -79,25 +79,35 @@ namespace TeleSharp.TL
             this.Min = (this.Flags & 4096) != 0;
             this.Id = br.ReadInt32();
             if ((this.Flags & 8192) != 0)
+            {
                 this.AccessHash = br.ReadInt64();
+            }
             else
+            {
                 this.AccessHash = null;
+            }
 
             this.Title = StringUtil.Deserialize(br);
             if ((this.Flags & 64) != 0)
+            {
                 this.Username = StringUtil.Deserialize(br);
+            }
             else
+            {
                 this.Username = null;
+            }
 
             this.Photo = (TLAbsChatPhoto)ObjectUtils.DeserializeObject(br);
             this.Date = br.ReadInt32();
             this.Version = br.ReadInt32();
             if ((this.Flags & 512) != 0)
+            {
                 this.RestrictionReason = StringUtil.Deserialize(br);
+            }
             else
+            {
                 this.RestrictionReason = null;
-
-
+            }
         }
 
         public override void SerializeBody(BinaryWriter bw)
@@ -119,16 +129,23 @@ namespace TeleSharp.TL
 
             bw.Write(this.Id);
             if ((this.Flags & 8192) != 0)
+            {
                 bw.Write(this.AccessHash.Value);
+            }
+
             StringUtil.Serialize(this.Title, bw);
             if ((this.Flags & 64) != 0)
+            {
                 StringUtil.Serialize(this.Username, bw);
+            }
+
             ObjectUtils.SerializeObject(this.Photo, bw);
             bw.Write(this.Date);
             bw.Write(this.Version);
             if ((this.Flags & 512) != 0)
+            {
                 StringUtil.Serialize(this.RestrictionReason, bw);
-
+            }
         }
     }
 }

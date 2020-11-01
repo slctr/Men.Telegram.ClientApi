@@ -38,11 +38,13 @@ namespace TeleSharp.TL.Updates
             this.Final = (this.Flags & 1) != 0;
             this.Pts = br.ReadInt32();
             if ((this.Flags & 2) != 0)
+            {
                 this.Timeout = br.ReadInt32();
+            }
             else
+            {
                 this.Timeout = null;
-
-
+            }
         }
 
         public override void SerializeBody(BinaryWriter bw)
@@ -53,8 +55,9 @@ namespace TeleSharp.TL.Updates
 
             bw.Write(this.Pts);
             if ((this.Flags & 2) != 0)
+            {
                 bw.Write(this.Timeout.Value);
-
+            }
         }
     }
 }

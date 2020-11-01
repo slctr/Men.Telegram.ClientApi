@@ -40,9 +40,13 @@ namespace TeleSharp.TL
             this.UserId = br.ReadInt32();
             this.Query = StringUtil.Deserialize(br);
             if ((this.Flags & 1) != 0)
+            {
                 this.Geo = (TLAbsGeoPoint)ObjectUtils.DeserializeObject(br);
+            }
             else
+            {
                 this.Geo = null;
+            }
 
             this.Offset = StringUtil.Deserialize(br);
 
@@ -57,7 +61,10 @@ namespace TeleSharp.TL
             bw.Write(this.UserId);
             StringUtil.Serialize(this.Query, bw);
             if ((this.Flags & 1) != 0)
+            {
                 ObjectUtils.SerializeObject(this.Geo, bw);
+            }
+
             StringUtil.Serialize(this.Offset, bw);
 
         }

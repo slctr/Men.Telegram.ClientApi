@@ -34,7 +34,10 @@ namespace TeleSharp.TL
                 ((TLObject)obj).DeserializeBody(reader);
                 return obj;
             }
-            else throw new NotImplementedException("Weird Type : " + t.Namespace + " | " + t.Name);
+            else
+            {
+                throw new NotImplementedException("Weird Type : " + t.Namespace + " | " + t.Name);
+            }
         }
         public static void SerializeObject(object obj, BinaryWriter writer)
         {
@@ -42,7 +45,11 @@ namespace TeleSharp.TL
         }
         public static TLVector<T> DeserializeVector<T>(BinaryReader reader)
         {
-            if (reader.ReadInt32() != 481674261) throw new InvalidDataException("Bad Constructor");
+            if (reader.ReadInt32() != 481674261)
+            {
+                throw new InvalidDataException("Bad Constructor");
+            }
+
             TLVector<T> t = new TLVector<T>();
             t.DeserializeBody(reader);
             return t;

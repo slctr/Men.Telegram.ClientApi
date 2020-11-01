@@ -10,13 +10,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="Constructor.tmp">
+    <None Update="Tempaltes\Constructor.cstemplate">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="ConstructorAbs.tmp">
+    <None Update="Tempaltes\ConstructorAbs.cstemplate">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Method.tmp">
+    <None Update="Tempaltes\Method.cstemplate">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

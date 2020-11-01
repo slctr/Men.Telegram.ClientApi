@@ -111,17 +111,26 @@ namespace TeleSharp.TL
     {
         public static bool Deserialize(BinaryReader reader)
         {
-            var FalseCNumber = -1132882121;
-            var TrueCNumber = -1720552011;
-            var readed = reader.ReadInt32();
-            if (readed == FalseCNumber) return false;
-            else if (readed == TrueCNumber) return true;
-            else throw new InvalidDataException(String.Format("Invalid Boolean Data : {0}", readed.ToString()));
+            int FalseCNumber = -1132882121;
+            int TrueCNumber = -1720552011;
+            int readed = reader.ReadInt32();
+            if (readed == FalseCNumber)
+            {
+                return false;
+            }
+            else if (readed == TrueCNumber)
+            {
+                return true;
+            }
+            else
+            {
+                throw new InvalidDataException(String.Format("Invalid Boolean Data : {0}", readed.ToString()));
+            }
         }
         public static void Serialize(bool src, BinaryWriter writer)
         {
-            var FalseCNumber = -1132882121;
-            var TrueCNumber = -1720552011;
+            int FalseCNumber = -1132882121;
+            int TrueCNumber = -1720552011;
             writer.Write(src ? TrueCNumber : FalseCNumber);
         }
     }

@@ -40,17 +40,23 @@ namespace TeleSharp.TL
             this.UserId = br.ReadInt32();
             this.Query = StringUtil.Deserialize(br);
             if ((this.Flags & 1) != 0)
+            {
                 this.Geo = (TLAbsGeoPoint)ObjectUtils.DeserializeObject(br);
+            }
             else
+            {
                 this.Geo = null;
+            }
 
             this.Id = StringUtil.Deserialize(br);
             if ((this.Flags & 2) != 0)
+            {
                 this.MsgId = (TLInputBotInlineMessageID)ObjectUtils.DeserializeObject(br);
+            }
             else
+            {
                 this.MsgId = null;
-
-
+            }
         }
 
         public override void SerializeBody(BinaryWriter bw)
@@ -61,11 +67,15 @@ namespace TeleSharp.TL
             bw.Write(this.UserId);
             StringUtil.Serialize(this.Query, bw);
             if ((this.Flags & 1) != 0)
+            {
                 ObjectUtils.SerializeObject(this.Geo, bw);
+            }
+
             StringUtil.Serialize(this.Id, bw);
             if ((this.Flags & 2) != 0)
+            {
                 ObjectUtils.SerializeObject(this.MsgId, bw);
-
+            }
         }
     }
 }

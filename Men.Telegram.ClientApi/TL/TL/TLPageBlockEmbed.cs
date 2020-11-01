@@ -46,19 +46,31 @@ namespace TeleSharp.TL
             this.FullWidth = (this.Flags & 1) != 0;
             this.AllowScrolling = (this.Flags & 8) != 0;
             if ((this.Flags & 2) != 0)
+            {
                 this.Url = StringUtil.Deserialize(br);
+            }
             else
+            {
                 this.Url = null;
+            }
 
             if ((this.Flags & 4) != 0)
+            {
                 this.Html = StringUtil.Deserialize(br);
+            }
             else
+            {
                 this.Html = null;
+            }
 
             if ((this.Flags & 16) != 0)
+            {
                 this.PosterPhotoId = br.ReadInt64();
+            }
             else
+            {
                 this.PosterPhotoId = null;
+            }
 
             this.W = br.ReadInt32();
             this.H = br.ReadInt32();
@@ -74,11 +86,20 @@ namespace TeleSharp.TL
 
 
             if ((this.Flags & 2) != 0)
+            {
                 StringUtil.Serialize(this.Url, bw);
+            }
+
             if ((this.Flags & 4) != 0)
+            {
                 StringUtil.Serialize(this.Html, bw);
+            }
+
             if ((this.Flags & 16) != 0)
+            {
                 bw.Write(this.PosterPhotoId.Value);
+            }
+
             bw.Write(this.W);
             bw.Write(this.H);
             ObjectUtils.SerializeObject(this.Caption, bw);

@@ -65,71 +65,121 @@ namespace TeleSharp.TL
             this.DisplayUrl = StringUtil.Deserialize(br);
             this.Hash = br.ReadInt32();
             if ((this.Flags & 1) != 0)
+            {
                 this.Type = StringUtil.Deserialize(br);
+            }
             else
+            {
                 this.Type = null;
+            }
 
             if ((this.Flags & 2) != 0)
+            {
                 this.SiteName = StringUtil.Deserialize(br);
+            }
             else
+            {
                 this.SiteName = null;
+            }
 
             if ((this.Flags & 4) != 0)
+            {
                 this.Title = StringUtil.Deserialize(br);
+            }
             else
+            {
                 this.Title = null;
+            }
 
             if ((this.Flags & 8) != 0)
+            {
                 this.Description = StringUtil.Deserialize(br);
+            }
             else
+            {
                 this.Description = null;
+            }
 
             if ((this.Flags & 16) != 0)
+            {
                 this.Photo = (TLAbsPhoto)ObjectUtils.DeserializeObject(br);
+            }
             else
+            {
                 this.Photo = null;
+            }
 
             if ((this.Flags & 32) != 0)
+            {
                 this.EmbedUrl = StringUtil.Deserialize(br);
+            }
             else
+            {
                 this.EmbedUrl = null;
+            }
 
             if ((this.Flags & 32) != 0)
+            {
                 this.EmbedType = StringUtil.Deserialize(br);
+            }
             else
+            {
                 this.EmbedType = null;
+            }
 
             if ((this.Flags & 64) != 0)
+            {
                 this.EmbedWidth = br.ReadInt32();
+            }
             else
+            {
                 this.EmbedWidth = null;
+            }
 
             if ((this.Flags & 64) != 0)
+            {
                 this.EmbedHeight = br.ReadInt32();
+            }
             else
+            {
                 this.EmbedHeight = null;
+            }
 
             if ((this.Flags & 128) != 0)
+            {
                 this.Duration = br.ReadInt32();
+            }
             else
+            {
                 this.Duration = null;
+            }
 
             if ((this.Flags & 256) != 0)
+            {
                 this.Author = StringUtil.Deserialize(br);
+            }
             else
+            {
                 this.Author = null;
+            }
 
             if ((this.Flags & 512) != 0)
+            {
                 this.Document = (TLAbsDocument)ObjectUtils.DeserializeObject(br);
+            }
             else
+            {
                 this.Document = null;
+            }
 
             if ((this.Flags & 1024) != 0)
+            {
                 this.CachedPage = (TLAbsPage)ObjectUtils.DeserializeObject(br);
+            }
             else
+            {
                 this.CachedPage = null;
-
-
+            }
         }
 
         public override void SerializeBody(BinaryWriter bw)
@@ -142,32 +192,69 @@ namespace TeleSharp.TL
             StringUtil.Serialize(this.DisplayUrl, bw);
             bw.Write(this.Hash);
             if ((this.Flags & 1) != 0)
+            {
                 StringUtil.Serialize(this.Type, bw);
-            if ((this.Flags & 2) != 0)
-                StringUtil.Serialize(this.SiteName, bw);
-            if ((this.Flags & 4) != 0)
-                StringUtil.Serialize(this.Title, bw);
-            if ((this.Flags & 8) != 0)
-                StringUtil.Serialize(this.Description, bw);
-            if ((this.Flags & 16) != 0)
-                ObjectUtils.SerializeObject(this.Photo, bw);
-            if ((this.Flags & 32) != 0)
-                StringUtil.Serialize(this.EmbedUrl, bw);
-            if ((this.Flags & 32) != 0)
-                StringUtil.Serialize(this.EmbedType, bw);
-            if ((this.Flags & 64) != 0)
-                bw.Write(this.EmbedWidth.Value);
-            if ((this.Flags & 64) != 0)
-                bw.Write(this.EmbedHeight.Value);
-            if ((this.Flags & 128) != 0)
-                bw.Write(this.Duration.Value);
-            if ((this.Flags & 256) != 0)
-                StringUtil.Serialize(this.Author, bw);
-            if ((this.Flags & 512) != 0)
-                ObjectUtils.SerializeObject(this.Document, bw);
-            if ((this.Flags & 1024) != 0)
-                ObjectUtils.SerializeObject(this.CachedPage, bw);
+            }
 
+            if ((this.Flags & 2) != 0)
+            {
+                StringUtil.Serialize(this.SiteName, bw);
+            }
+
+            if ((this.Flags & 4) != 0)
+            {
+                StringUtil.Serialize(this.Title, bw);
+            }
+
+            if ((this.Flags & 8) != 0)
+            {
+                StringUtil.Serialize(this.Description, bw);
+            }
+
+            if ((this.Flags & 16) != 0)
+            {
+                ObjectUtils.SerializeObject(this.Photo, bw);
+            }
+
+            if ((this.Flags & 32) != 0)
+            {
+                StringUtil.Serialize(this.EmbedUrl, bw);
+            }
+
+            if ((this.Flags & 32) != 0)
+            {
+                StringUtil.Serialize(this.EmbedType, bw);
+            }
+
+            if ((this.Flags & 64) != 0)
+            {
+                bw.Write(this.EmbedWidth.Value);
+            }
+
+            if ((this.Flags & 64) != 0)
+            {
+                bw.Write(this.EmbedHeight.Value);
+            }
+
+            if ((this.Flags & 128) != 0)
+            {
+                bw.Write(this.Duration.Value);
+            }
+
+            if ((this.Flags & 256) != 0)
+            {
+                StringUtil.Serialize(this.Author, bw);
+            }
+
+            if ((this.Flags & 512) != 0)
+            {
+                ObjectUtils.SerializeObject(this.Document, bw);
+            }
+
+            if ((this.Flags & 1024) != 0)
+            {
+                ObjectUtils.SerializeObject(this.CachedPage, bw);
+            }
         }
     }
 }

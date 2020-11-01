@@ -6,18 +6,20 @@ namespace TLSharp.Core.Auth
 {
     public static class Authenticator
     {
-        public static async Task<Step3_Response> DoAuthentication(TcpTransport transport, CancellationToken token = default(CancellationToken))
+        public static async Task<Step3_Response> DoAuthentication(
+            TcpTransport transport,
+            CancellationToken token = default(CancellationToken))
         {
             token.ThrowIfCancellationRequested();
 
-            var sender = new MtProtoPlainSender(transport);
-            var step1 = new Step1_PQRequest();
+            MtProtoPlainSender sender = new MtProtoPlainSender(transport);
+            Step1_PQRequest step1 = new Step1_PQRequest();
 
             await sender.Send(step1.ToBytes(), token).ConfigureAwait(false);
-            var step1Response = step1.FromBytes(await sender.Receive(token)
+            Step1_Response step1Response = step1.FromBytes(await sender.Receive(token)
                 .ConfigureAwait(false));
 
-            var step2 = new Step2_DHExchange();
+            Step2_DHExchange step2 = new Step2_DHExchange();
             await sender.Send(step2.ToBytes(
                     step1Response.Nonce,
                     step1Response.ServerNonce,
@@ -25,10 +27,10 @@ namespace TLSharp.Core.Auth
                     step1Response.Pq), token)
                 .ConfigureAwait(false);
 
-            var step2Response = step2.FromBytes(await sender.Receive(token)
+            Step2_Response step2Response = step2.FromBytes(await sender.Receive(token)
                 .ConfigureAwait(false));
 
-            var step3 = new Step3_CompleteDHExchange();
+            Step3_CompleteDHExchange step3 = new Step3_CompleteDHExchange();
             await sender.Send(step3.ToBytes(
                     step2Response.Nonce,
                     step2Response.ServerNonce,
@@ -36,7 +38,7 @@ namespace TLSharp.Core.Auth
                     step2Response.EncryptedAnswer), token)
                 .ConfigureAwait(false);
 
-            var step3Response = step3.FromBytes(await sender.Receive(token)
+            Step3_Response step3Response = step3.FromBytes(await sender.Receive(token)
                 .ConfigureAwait(false));
 
             return step3Response;

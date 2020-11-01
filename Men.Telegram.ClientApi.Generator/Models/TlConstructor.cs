@@ -1,17 +1,17 @@
 ﻿using System.Collections.Generic;
 using Newtonsoft.Json;
 
-namespace TeleSharp.Generator.Models
+namespace Men.Telegram.ClientApi.Generator.Models
 {
-    internal class TlConstructor
+    public class TlConstructor
     {
         [JsonProperty("id")]
         public int Id { get; set; }
 
-        [JsonProperty("predicate")] 
+        [JsonProperty("predicate")]
         public string Predicate { get; set; }
 
-        [JsonProperty("params")] 
+        [JsonProperty("params")]
         public List<TlParam> Params { get; set; }
 
         [JsonProperty("type")]

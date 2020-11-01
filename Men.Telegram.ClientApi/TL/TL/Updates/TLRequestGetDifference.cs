@@ -38,9 +38,13 @@ namespace TeleSharp.TL.Updates
             this.Flags = br.ReadInt32();
             this.Pts = br.ReadInt32();
             if ((this.Flags & 1) != 0)
+            {
                 this.PtsTotalLimit = br.ReadInt32();
+            }
             else
+            {
                 this.PtsTotalLimit = null;
+            }
 
             this.Date = br.ReadInt32();
             this.Qts = br.ReadInt32();
@@ -54,7 +58,10 @@ namespace TeleSharp.TL.Updates
             bw.Write(this.Flags);
             bw.Write(this.Pts);
             if ((this.Flags & 1) != 0)
+            {
                 bw.Write(this.PtsTotalLimit.Value);
+            }
+
             bw.Write(this.Date);
             bw.Write(this.Qts);
 

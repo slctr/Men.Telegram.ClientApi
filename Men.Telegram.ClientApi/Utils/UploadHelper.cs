@@ -6,6 +6,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Men.Telegram.ClientApi;
 using TeleSharp.TL;
 using TeleSharp.TL.Upload;
 
@@ -16,13 +17,15 @@ namespace TLSharp.Core.Utils
         private static string GetFileHash(byte[] data)
         {
             string md5CheckSum;
-            using (var md5 = MD5.Create())
+            using (MD5 md5 = MD5.Create())
             {
-                var hash = md5.ComputeHash(data);
-                var hashResult = new StringBuilder(hash.Length * 2);
+                byte[] hash = md5.ComputeHash(data);
+                StringBuilder hashResult = new StringBuilder(hash.Length * 2);
 
                 foreach (byte t in hash)
+                {
                     hashResult.Append(t.ToString("x2"));
+                }
 
                 md5CheckSum = hashResult.ToString();
             }
@@ -38,7 +41,7 @@ namespace TLSharp.Core.Utils
 
         private static byte[] GetFile(StreamReader reader)
         {
-            var file = new byte[reader.BaseStream.Length];
+            byte[] file = new byte[reader.BaseStream.Length];
 
             using (reader)
             {
@@ -50,24 +53,24 @@ namespace TLSharp.Core.Utils
 
         private static Queue<byte[]> GetFileParts(byte[] file)
         {
-            var fileParts = new Queue<byte[]>();
+            Queue<byte[]> fileParts = new Queue<byte[]>();
 
             const int maxFilePart = 512 * 1024;
 
-            using (var stream = new MemoryStream(file))
+            using (MemoryStream stream = new MemoryStream(file))
             {
                 while (stream.Position != stream.Length)
                 {
                     if ((stream.Length - stream.Position) > maxFilePart)
                     {
-                        var temp = new byte[maxFilePart];
+                        byte[] temp = new byte[maxFilePart];
                         stream.Read(temp, 0, maxFilePart);
                         fileParts.Enqueue(temp);
                     }
                     else
                     {
-                        var length = stream.Length - stream.Position;
-                        var temp = new byte[length];
+                        long length = stream.Length - stream.Position;
+                        byte[] temp = new byte[length];
                         stream.Read(temp, 0, (int)(length));
                         fileParts.Enqueue(temp);
                     }
@@ -82,15 +85,15 @@ namespace TLSharp.Core.Utils
         {
             token.ThrowIfCancellationRequested();
 
-            var file = GetFile(reader);
-            var fileParts = GetFileParts(file);
+            byte[] file = GetFile(reader);
+            Queue<byte[]> fileParts = GetFileParts(file);
 
             int partNumber = 0;
             int partsCount = fileParts.Count;
             long file_id = BitConverter.ToInt64(Helpers.GenerateRandomBytes(8), 0);
             while (fileParts.Count != 0)
             {
-                var part = fileParts.Dequeue();
+                byte[] part = fileParts.Dequeue();
 
                 if (isBigFileUpload)
                 {

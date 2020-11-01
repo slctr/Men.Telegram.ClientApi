@@ -48,9 +48,13 @@ namespace TeleSharp.TL.Messages
             this.ClearDraft = (this.Flags & 128) != 0;
             this.Peer = (TLAbsInputPeer)ObjectUtils.DeserializeObject(br);
             if ((this.Flags & 1) != 0)
+            {
                 this.ReplyToMsgId = br.ReadInt32();
+            }
             else
+            {
                 this.ReplyToMsgId = null;
+            }
 
             this.RandomId = br.ReadInt64();
             this.QueryId = br.ReadInt64();
@@ -68,7 +72,10 @@ namespace TeleSharp.TL.Messages
 
             ObjectUtils.SerializeObject(this.Peer, bw);
             if ((this.Flags & 1) != 0)
+            {
                 bw.Write(this.ReplyToMsgId.Value);
+            }
+
             bw.Write(this.RandomId);
             bw.Write(this.QueryId);
             StringUtil.Serialize(this.Id, bw);

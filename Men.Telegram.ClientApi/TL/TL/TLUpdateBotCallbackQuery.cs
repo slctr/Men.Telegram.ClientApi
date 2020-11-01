@@ -45,16 +45,22 @@ namespace TeleSharp.TL
             this.MsgId = br.ReadInt32();
             this.ChatInstance = br.ReadInt64();
             if ((this.Flags & 1) != 0)
+            {
                 this.Data = BytesUtil.Deserialize(br);
+            }
             else
+            {
                 this.Data = null;
+            }
 
             if ((this.Flags & 2) != 0)
+            {
                 this.GameShortName = StringUtil.Deserialize(br);
+            }
             else
+            {
                 this.GameShortName = null;
-
-
+            }
         }
 
         public override void SerializeBody(BinaryWriter bw)
@@ -68,10 +74,14 @@ namespace TeleSharp.TL
             bw.Write(this.MsgId);
             bw.Write(this.ChatInstance);
             if ((this.Flags & 1) != 0)
+            {
                 BytesUtil.Serialize(this.Data, bw);
-            if ((this.Flags & 2) != 0)
-                StringUtil.Serialize(this.GameShortName, bw);
+            }
 
+            if ((this.Flags & 2) != 0)
+            {
+                StringUtil.Serialize(this.GameShortName, bw);
+            }
         }
     }
 }

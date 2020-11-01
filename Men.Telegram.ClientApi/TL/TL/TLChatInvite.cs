@@ -51,11 +51,13 @@ namespace TeleSharp.TL
             this.Photo = (TLAbsChatPhoto)ObjectUtils.DeserializeObject(br);
             this.ParticipantsCount = br.ReadInt32();
             if ((this.Flags & 16) != 0)
+            {
                 this.Participants = (TLVector<TLAbsUser>)ObjectUtils.DeserializeVector<TLAbsUser>(br);
+            }
             else
+            {
                 this.Participants = null;
-
-
+            }
         }
 
         public override void SerializeBody(BinaryWriter bw)
@@ -71,8 +73,9 @@ namespace TeleSharp.TL
             ObjectUtils.SerializeObject(this.Photo, bw);
             bw.Write(this.ParticipantsCount);
             if ((this.Flags & 16) != 0)
+            {
                 ObjectUtils.SerializeObject(this.Participants, bw);
-
+            }
         }
     }
 }

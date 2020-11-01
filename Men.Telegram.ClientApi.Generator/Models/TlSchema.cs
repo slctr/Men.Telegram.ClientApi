@@ -1,14 +1,14 @@
 ﻿using System.Collections.Generic;
 using Newtonsoft.Json;
 
-namespace TeleSharp.Generator.Models
+namespace Men.Telegram.ClientApi.Generator.Models
 {
-    internal class TlSchema
+    public class TlSchema
     {
-        [JsonProperty("constructors")] 
+        [JsonProperty("constructors")]
         public List<TlConstructor> Constructors { get; set; }
 
-        [JsonProperty("methods")] 
+        [JsonProperty("methods")]
         public List<TlMethod> Methods { get; set; }
     }
 }

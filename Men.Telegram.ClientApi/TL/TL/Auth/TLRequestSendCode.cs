@@ -41,9 +41,13 @@ namespace TeleSharp.TL.Auth
             this.AllowFlashcall = (this.Flags & 1) != 0;
             this.PhoneNumber = StringUtil.Deserialize(br);
             if ((this.Flags & 1) != 0)
+            {
                 this.CurrentNumber = BoolUtil.Deserialize(br);
+            }
             else
+            {
                 this.CurrentNumber = null;
+            }
 
             this.ApiId = br.ReadInt32();
             this.ApiHash = StringUtil.Deserialize(br);
@@ -58,7 +62,10 @@ namespace TeleSharp.TL.Auth
 
             StringUtil.Serialize(this.PhoneNumber, bw);
             if ((this.Flags & 1) != 0)
+            {
                 BoolUtil.Serialize(this.CurrentNumber.Value, bw);
+            }
+
             bw.Write(this.ApiId);
             StringUtil.Serialize(this.ApiHash, bw);
 

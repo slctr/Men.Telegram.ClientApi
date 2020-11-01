@@ -42,21 +42,31 @@ namespace TeleSharp.TL
             this.Voice = (this.Flags & 1024) != 0;
             this.Duration = br.ReadInt32();
             if ((this.Flags & 1) != 0)
+            {
                 this.Title = StringUtil.Deserialize(br);
+            }
             else
+            {
                 this.Title = null;
+            }
 
             if ((this.Flags & 2) != 0)
+            {
                 this.Performer = StringUtil.Deserialize(br);
+            }
             else
+            {
                 this.Performer = null;
+            }
 
             if ((this.Flags & 4) != 0)
+            {
                 this.Waveform = BytesUtil.Deserialize(br);
+            }
             else
+            {
                 this.Waveform = null;
-
-
+            }
         }
 
         public override void SerializeBody(BinaryWriter bw)
@@ -67,12 +77,19 @@ namespace TeleSharp.TL
 
             bw.Write(this.Duration);
             if ((this.Flags & 1) != 0)
+            {
                 StringUtil.Serialize(this.Title, bw);
-            if ((this.Flags & 2) != 0)
-                StringUtil.Serialize(this.Performer, bw);
-            if ((this.Flags & 4) != 0)
-                BytesUtil.Serialize(this.Waveform, bw);
+            }
 
+            if ((this.Flags & 2) != 0)
+            {
+                StringUtil.Serialize(this.Performer, bw);
+            }
+
+            if ((this.Flags & 4) != 0)
+            {
+                BytesUtil.Serialize(this.Waveform, bw);
+            }
         }
     }
 }

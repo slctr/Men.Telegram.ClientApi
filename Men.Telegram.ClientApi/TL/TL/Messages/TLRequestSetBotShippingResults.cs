@@ -38,16 +38,22 @@ namespace TeleSharp.TL.Messages
             this.Flags = br.ReadInt32();
             this.QueryId = br.ReadInt64();
             if ((this.Flags & 1) != 0)
+            {
                 this.Error = StringUtil.Deserialize(br);
+            }
             else
+            {
                 this.Error = null;
+            }
 
             if ((this.Flags & 2) != 0)
+            {
                 this.ShippingOptions = (TLVector<TLShippingOption>)ObjectUtils.DeserializeVector<TLShippingOption>(br);
+            }
             else
+            {
                 this.ShippingOptions = null;
-
-
+            }
         }
 
         public override void SerializeBody(BinaryWriter bw)
@@ -57,10 +63,14 @@ namespace TeleSharp.TL.Messages
             bw.Write(this.Flags);
             bw.Write(this.QueryId);
             if ((this.Flags & 1) != 0)
+            {
                 StringUtil.Serialize(this.Error, bw);
-            if ((this.Flags & 2) != 0)
-                ObjectUtils.SerializeObject(this.ShippingOptions, bw);
+            }
 
+            if ((this.Flags & 2) != 0)
+            {
+                ObjectUtils.SerializeObject(this.ShippingOptions, bw);
+            }
         }
         public override void DeserializeResponse(BinaryReader br)
         {

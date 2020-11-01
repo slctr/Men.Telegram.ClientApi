@@ -46,16 +46,22 @@ namespace TeleSharp.TL
             this.PtsCount = br.ReadInt32();
             this.Date = br.ReadInt32();
             if ((this.Flags & 512) != 0)
+            {
                 this.Media = (TLAbsMessageMedia)ObjectUtils.DeserializeObject(br);
+            }
             else
+            {
                 this.Media = null;
+            }
 
             if ((this.Flags & 128) != 0)
+            {
                 this.Entities = (TLVector<TLAbsMessageEntity>)ObjectUtils.DeserializeVector<TLAbsMessageEntity>(br);
+            }
             else
+            {
                 this.Entities = null;
-
-
+            }
         }
 
         public override void SerializeBody(BinaryWriter bw)
@@ -69,10 +75,14 @@ namespace TeleSharp.TL
             bw.Write(this.PtsCount);
             bw.Write(this.Date);
             if ((this.Flags & 512) != 0)
+            {
                 ObjectUtils.SerializeObject(this.Media, bw);
-            if ((this.Flags & 128) != 0)
-                ObjectUtils.SerializeObject(this.Entities, bw);
+            }
 
+            if ((this.Flags & 128) != 0)
+            {
+                ObjectUtils.SerializeObject(this.Entities, bw);
+            }
         }
     }
 }

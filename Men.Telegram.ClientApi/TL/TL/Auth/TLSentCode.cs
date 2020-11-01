@@ -42,16 +42,22 @@ namespace TeleSharp.TL.Auth
             this.Type = (Auth.TLAbsSentCodeType)ObjectUtils.DeserializeObject(br);
             this.PhoneCodeHash = StringUtil.Deserialize(br);
             if ((this.Flags & 2) != 0)
+            {
                 this.NextType = (Auth.TLAbsCodeType)ObjectUtils.DeserializeObject(br);
+            }
             else
+            {
                 this.NextType = null;
+            }
 
             if ((this.Flags & 4) != 0)
+            {
                 this.Timeout = br.ReadInt32();
+            }
             else
+            {
                 this.Timeout = null;
-
-
+            }
         }
 
         public override void SerializeBody(BinaryWriter bw)
@@ -63,10 +69,14 @@ namespace TeleSharp.TL.Auth
             ObjectUtils.SerializeObject(this.Type, bw);
             StringUtil.Serialize(this.PhoneCodeHash, bw);
             if ((this.Flags & 2) != 0)
+            {
                 ObjectUtils.SerializeObject(this.NextType, bw);
-            if ((this.Flags & 4) != 0)
-                bw.Write(this.Timeout.Value);
+            }
 
+            if ((this.Flags & 4) != 0)
+            {
+                bw.Write(this.Timeout.Value);
+            }
         }
     }
 }

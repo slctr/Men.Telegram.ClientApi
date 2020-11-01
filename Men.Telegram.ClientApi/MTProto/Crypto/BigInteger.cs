@@ -214,7 +214,9 @@ namespace TLSharp.Core.MTProto.Crypto
             int radix)
         {
             if (str.Length == 0)
+            {
                 throw new FormatException("Zero length BigInteger");
+            }
 
             NumberStyles style;
             int chunk;
@@ -255,7 +257,9 @@ namespace TLSharp.Core.MTProto.Crypto
             if (str[0] == '-')
             {
                 if (str.Length == 1)
+                {
                     throw new FormatException("Zero length BigInteger");
+                }
 
                 this.sign = -1;
                 index = 1;
@@ -299,7 +303,9 @@ namespace TLSharp.Core.MTProto.Crypto
                         case 2:
                             // TODO Need this because we are parsing in radix 10 above
                             if (i > 1)
+                            {
                                 throw new FormatException("Bad character in radix 2 string: " + s);
+                            }
 
                             // TODO Parse 64 bits at a time
                             b = b.ShiftLeft(1);
@@ -377,7 +383,9 @@ namespace TLSharp.Core.MTProto.Crypto
             int length)
         {
             if (length == 0)
+            {
                 throw new FormatException("Zero length BigInteger");
+            }
 
             // TODO Move this processing into MakeMagnitude (provide sign argument)
             if ((sbyte)bytes[offset] < 0)
@@ -496,7 +504,9 @@ namespace TLSharp.Core.MTProto.Crypto
             int length)
         {
             if (sign < -1 || sign > 1)
+            {
                 throw new FormatException("Invalid sign value");
+            }
 
             if (sign == 0)
             {
@@ -515,7 +525,9 @@ namespace TLSharp.Core.MTProto.Crypto
             Random random)
         {
             if (sizeInBits < 0)
+            {
                 throw new ArgumentException("sizeInBits must be non-negative");
+            }
 
             this.nBits = -1;
             this.nBitLength = -1;
@@ -546,7 +558,9 @@ namespace TLSharp.Core.MTProto.Crypto
             Random random)
         {
             if (bitLength < 2)
+            {
                 throw new ArithmeticException("bitLength < 2");
+            }
 
             this.sign = 1;
             this.nBitLength = bitLength;
@@ -583,10 +597,14 @@ namespace TLSharp.Core.MTProto.Crypto
                 this.mQuote = -1L;
 
                 if (certainty < 1)
+                {
                     break;
+                }
 
                 if (this.CheckProbablePrime(certainty, random))
+                {
                     break;
+                }
 
                 if (bitLength > 32)
                 {
@@ -598,7 +616,9 @@ namespace TLSharp.Core.MTProto.Crypto
                         this.mQuote = -1L;
 
                         if (this.CheckProbablePrime(certainty, random))
+                        {
                             return;
+                        }
                     }
                 }
             }
@@ -641,15 +661,21 @@ namespace TLSharp.Core.MTProto.Crypto
             BigInteger value)
         {
             if (this.sign == 0)
+            {
                 return value;
+            }
 
             if (this.sign != value.sign)
             {
                 if (value.sign == 0)
+                {
                     return this;
+                }
 
                 if (value.sign < 0)
+                {
                     return this.Subtract(value.Negate());
+                }
 
                 return value.Subtract(this.Negate());
             }
@@ -674,7 +700,9 @@ namespace TLSharp.Core.MTProto.Crypto
             // Conservatively avoid over-allocation when no overflow possible
             uint limit = uint.MaxValue;
             if (big.Length == small.Length)
+            {
                 limit -= (uint)small[0];
+            }
 
             bool possibleOverflow = (uint)big[0] >= limit;
 
@@ -805,10 +833,14 @@ namespace TLSharp.Core.MTProto.Crypto
             for (;;)
             {
                 if (indx >= mag.Length)
+                {
                     return 0;
+                }
 
                 if (mag[indx] != 0)
+                {
                     break;
+                }
 
                 ++indx;
             }
@@ -943,7 +975,9 @@ namespace TLSharp.Core.MTProto.Crypto
                 uint v2 = (uint)y[yIndx++];
 
                 if (v1 != v2)
+                {
                     return v1 < v2 ? -1 : 1;
+                }
             }
 
             return 0;
@@ -1025,7 +1059,9 @@ namespace TLSharp.Core.MTProto.Crypto
                         while (x[xStart] == 0)
                         {
                             if (++xStart == x.Length)
+                            {
                                 return count;
+                            }
                         }
 
                         //xBitLength = calcBitLength(xStart, x);
@@ -1034,12 +1070,16 @@ namespace TLSharp.Core.MTProto.Crypto
                         if (xBitLength <= yBitLength)
                         {
                             if (xBitLength < yBitLength)
+                            {
                                 return count;
+                            }
 
                             xyCmp = CompareNoLeadingZeroes(xStart, x, yStart, y);
 
                             if (xyCmp <= 0)
+                            {
                                 break;
+                            }
                         }
                     }
 
@@ -1051,7 +1091,9 @@ namespace TLSharp.Core.MTProto.Crypto
                         uint firstC = (uint)c[cStart] >> 1;
                         uint firstX = (uint)x[xStart];
                         if (firstC > firstX)
+                        {
                             ++shift;
+                        }
                     }
 
                     if (shift < 2)
@@ -1095,10 +1137,14 @@ namespace TLSharp.Core.MTProto.Crypto
             BigInteger val)
         {
             if (val.sign == 0)
+            {
                 throw new ArithmeticException("Division by zero error");
+            }
 
             if (this.sign == 0)
+            {
                 return Zero;
+            }
 
             if (val.QuickPow2Check()) // val is power of two
             {
@@ -1115,7 +1161,9 @@ namespace TLSharp.Core.MTProto.Crypto
             BigInteger val)
         {
             if (val.sign == 0)
+            {
                 throw new ArithmeticException("Division by zero error");
+            }
 
             BigInteger[] biggies = new BigInteger[2];
 
@@ -1148,14 +1196,20 @@ namespace TLSharp.Core.MTProto.Crypto
             object obj)
         {
             if (obj == this)
+            {
                 return true;
+            }
 
             BigInteger biggie = obj as BigInteger;
             if (biggie == null)
+            {
                 return false;
+            }
 
             if (biggie.sign != this.sign || biggie.magnitude.Length != this.magnitude.Length)
+            {
                 return false;
+            }
 
             for (int i = 0; i < this.magnitude.Length; i++)
             {
@@ -1172,10 +1226,14 @@ namespace TLSharp.Core.MTProto.Crypto
             BigInteger value)
         {
             if (value.sign == 0)
+            {
                 return this.Abs();
+            }
 
             if (this.sign == 0)
+            {
                 return value.Abs();
+            }
 
             BigInteger r;
             BigInteger u = this;
@@ -1211,10 +1269,14 @@ namespace TLSharp.Core.MTProto.Crypto
         private BigInteger Inc()
         {
             if (this.sign == 0)
+            {
                 return One;
+            }
 
             if (this.sign < 0)
+            {
                 return new BigInteger(-1, doSubBigLil(this.magnitude, One.magnitude), true);
+            }
 
             return this.AddToMagnitude(One.magnitude);
         }
@@ -1238,15 +1300,21 @@ namespace TLSharp.Core.MTProto.Crypto
             int certainty)
         {
             if (certainty <= 0)
+            {
                 return true;
+            }
 
             BigInteger n = this.Abs();
 
             if (!n.TestBit(0))
+            {
                 return n.Equals(Two);
+            }
 
             if (n.Equals(One))
+            {
                 return false;
+            }
 
             return n.CheckProbablePrime(certainty, RandomSource);
         }
@@ -1335,12 +1403,16 @@ namespace TLSharp.Core.MTProto.Crypto
                     while (!y.Equals(nMinusOne))
                     {
                         if (++j == s)
+                        {
                             return false;
+                        }
 
                         y = y.ModPow(Two, n);
 
                         if (y.Equals(One))
+                        {
                             return false;
+                        }
                     }
                 }
 
@@ -1445,7 +1517,9 @@ namespace TLSharp.Core.MTProto.Crypto
             get
             {
                 if (this.sign == 0)
+                {
                     return 0;
+                }
 
                 long v;
                 if (this.magnitude.Length > 1)
@@ -1477,7 +1551,9 @@ namespace TLSharp.Core.MTProto.Crypto
             BigInteger m)
         {
             if (m.sign < 1)
+            {
                 throw new ArithmeticException("Modulus must be positive");
+            }
 
             BigInteger biggie = this.Remainder(m);
 
@@ -1488,7 +1564,9 @@ namespace TLSharp.Core.MTProto.Crypto
             BigInteger m)
         {
             if (m.sign < 1)
+            {
                 throw new ArithmeticException("Modulus must be positive");
+            }
 
             // TODO Too slow at the moment
             //			// "Fast Key Exchange with Elliptic Curve Systems" R.Schoeppel
@@ -1532,7 +1610,9 @@ namespace TLSharp.Core.MTProto.Crypto
             BigInteger gcd = ExtEuclid(this.Mod(m), m, x, null);
 
             if (!gcd.Equals(One))
+            {
                 throw new ArithmeticException("Numbers not relatively prime.");
+            }
 
             if (x.sign < 0)
             {
@@ -1614,16 +1694,24 @@ namespace TLSharp.Core.MTProto.Crypto
             BigInteger m)
         {
             if (m.sign < 1)
+            {
                 throw new ArithmeticException("Modulus must be positive");
+            }
 
             if (m.Equals(One))
+            {
                 return Zero;
+            }
 
             if (exponent.sign == 0)
+            {
                 return One;
+            }
 
             if (this.sign == 0)
+            {
                 return Zero;
+            }
 
             int[] zVal = null;
             int[] yAccum = null;
@@ -1853,7 +1941,9 @@ namespace TLSharp.Core.MTProto.Crypto
             int i = z.Length;
 
             if (i < 1)
+            {
                 return x;
+            }
 
             int xBase = x.Length - y.Length;
 
@@ -1927,13 +2017,17 @@ namespace TLSharp.Core.MTProto.Crypto
             long m)
         {
             if (m < 1)
+            {
                 throw new ArithmeticException("Modulus must be positive");
+            }
 
             long[] x = new long[2];
             long gcd = FastExtEuclid(v, m, x);
 
             if (gcd != 1)
+            {
                 throw new ArithmeticException("Numbers not relatively prime.");
+            }
 
             if (x[0] < 0)
             {
@@ -2065,7 +2159,9 @@ namespace TLSharp.Core.MTProto.Crypto
             BigInteger val)
         {
             if (this.sign == 0 || val.sign == 0)
+            {
                 return Zero;
+            }
 
             if (val.QuickPow2Check()) // val is power of two
             {
@@ -2096,7 +2192,9 @@ namespace TLSharp.Core.MTProto.Crypto
         public BigInteger Negate()
         {
             if (this.sign == 0)
+            {
                 return this;
+            }
 
             return new BigInteger(-this.sign, this.magnitude, false);
         }
@@ -2104,10 +2202,14 @@ namespace TLSharp.Core.MTProto.Crypto
         public BigInteger NextProbablePrime()
         {
             if (this.sign < 0)
+            {
                 throw new ArithmeticException("Cannot be called on value < 0");
+            }
 
             if (this.CompareTo(Two) < 0)
+            {
                 return Two;
+            }
 
             BigInteger n = this.Inc().SetBit(0);
 
@@ -2151,7 +2253,11 @@ namespace TLSharp.Core.MTProto.Crypto
                     y = y.Multiply(z);
                 }
                 exp >>= 1;
-                if (exp == 0) break;
+                if (exp == 0)
+                {
+                    break;
+                }
+
                 z = z.Multiply(z);
             }
 
@@ -2234,7 +2340,9 @@ namespace TLSharp.Core.MTProto.Crypto
                         while (x[xStart] == 0)
                         {
                             if (++xStart == x.Length)
+                            {
                                 return x;
+                            }
                         }
 
                         //xBitLength = calcBitLength(xStart, x);
@@ -2243,12 +2351,16 @@ namespace TLSharp.Core.MTProto.Crypto
                         if (xBitLength <= yBitLength)
                         {
                             if (xBitLength < yBitLength)
+                            {
                                 return x;
+                            }
 
                             xyCmp = CompareNoLeadingZeroes(xStart, x, yStart, y);
 
                             if (xyCmp <= 0)
+                            {
                                 break;
+                            }
                         }
                     }
 
@@ -2260,7 +2372,9 @@ namespace TLSharp.Core.MTProto.Crypto
                         uint firstC = (uint)c[cStart] >> 1;
                         uint firstX = (uint)x[xStart];
                         if (firstC > firstX)
+                        {
                             ++shift;
+                        }
                     }
 
                     if (shift < 2)
@@ -2293,10 +2407,14 @@ namespace TLSharp.Core.MTProto.Crypto
             BigInteger n)
         {
             if (n.sign == 0)
+            {
                 throw new ArithmeticException("Division by zero error");
+            }
 
             if (this.sign == 0)
+            {
                 return Zero;
+            }
 
             // For small values, use fast remainder method
             if (n.magnitude.Length == 1)
@@ -2306,7 +2424,9 @@ namespace TLSharp.Core.MTProto.Crypto
                 if (val > 0)
                 {
                     if (val == 1)
+                    {
                         return Zero;
+                    }
 
                     // TODO Make this func work on uint, and handle val == 1?
                     int rem = this.Remainder(val);
@@ -2318,7 +2438,9 @@ namespace TLSharp.Core.MTProto.Crypto
             }
 
             if (CompareNoLeadingZeroes(0, this.magnitude, 0, n.magnitude) < 0)
+            {
                 return this;
+            }
 
             int[] result;
             if (n.QuickPow2Check())  // n is power of two
@@ -2338,7 +2460,9 @@ namespace TLSharp.Core.MTProto.Crypto
             int n)
         {
             if (n < 1)
+            {
                 return ZeroMagnitude;
+            }
 
             int numWords = (n + BitsPerInt - 1) / BitsPerInt;
             numWords = System.Math.Min(numWords, this.magnitude.Length);
@@ -2405,13 +2529,19 @@ namespace TLSharp.Core.MTProto.Crypto
             int n)
         {
             if (this.sign == 0 || this.magnitude.Length == 0)
+            {
                 return Zero;
+            }
 
             if (n == 0)
+            {
                 return this;
+            }
 
             if (n < 0)
+            {
                 return this.ShiftRight(-n);
+            }
 
             BigInteger result = new BigInteger(this.sign, ShiftLeft(this.magnitude, n), true);
 
@@ -2497,13 +2627,19 @@ namespace TLSharp.Core.MTProto.Crypto
             int n)
         {
             if (n == 0)
+            {
                 return this;
+            }
 
             if (n < 0)
+            {
                 return this.ShiftLeft(-n);
+            }
 
             if (n >= this.BitLength)
+            {
                 return (this.sign < 0 ? One.Negate() : Zero);
+            }
 
             //			int[] res = (int[]) this.magnitude.Clone();
             //
@@ -2587,17 +2723,25 @@ namespace TLSharp.Core.MTProto.Crypto
             BigInteger n)
         {
             if (n.sign == 0)
+            {
                 return this;
+            }
 
             if (this.sign == 0)
+            {
                 return n.Negate();
+            }
 
             if (this.sign != n.sign)
+            {
                 return this.Add(n.Negate());
+            }
 
             int compare = CompareNoLeadingZeroes(0, this.magnitude, 0, n.magnitude);
             if (compare == 0)
+            {
                 return Zero;
+            }
 
             BigInteger bigun, lilun;
             if (compare < 0)
@@ -2636,7 +2780,9 @@ namespace TLSharp.Core.MTProto.Crypto
             bool unsigned)
         {
             if (this.sign == 0)
+            {
                 return unsigned ? ZeroEncoding : new byte[1];
+            }
 
             int nBits = (unsigned && this.sign > 0)
                 ? this.BitLength
@@ -2734,10 +2880,14 @@ namespace TLSharp.Core.MTProto.Crypto
 
             // NB: Can only happen to internally managed instances
             if (this.magnitude == null)
+            {
                 return "null";
+            }
 
             if (this.sign == 0)
+            {
                 return "0";
+            }
 
             Debug.Assert(this.magnitude.Length > 0);
 
@@ -2824,7 +2974,9 @@ namespace TLSharp.Core.MTProto.Crypto
             int lsw = (int)value;
 
             if (msw != 0)
+            {
                 return new BigInteger(1, new int[] { msw, lsw }, false);
+            }
 
             if (lsw != 0)
             {
@@ -2846,7 +2998,9 @@ namespace TLSharp.Core.MTProto.Crypto
             if (value < 0)
             {
                 if (value == long.MinValue)
+                {
                     return createValueOf(~value).Not();
+                }
 
                 return createValueOf(-value).Negate();
             }
@@ -2887,14 +3041,18 @@ namespace TLSharp.Core.MTProto.Crypto
         public int GetLowestSetBit()
         {
             if (this.sign == 0)
+            {
                 return -1;
+            }
 
             int w = this.magnitude.Length;
 
             while (--w > 0)
             {
                 if (this.magnitude[w] != 0)
+                {
                     break;
+                }
             }
 
             int word = (int)this.magnitude[w];
@@ -2911,7 +3069,9 @@ namespace TLSharp.Core.MTProto.Crypto
             while (b > 0)
             {
                 if ((word << b) == int.MinValue)
+                {
                     break;
+                }
 
                 b--;
             }
@@ -2923,14 +3083,20 @@ namespace TLSharp.Core.MTProto.Crypto
             int n)
         {
             if (n < 0)
+            {
                 throw new ArithmeticException("Bit position must not be negative");
+            }
 
             if (this.sign < 0)
+            {
                 return !this.Not().TestBit(n);
+            }
 
             int wordNum = n / 32;
             if (wordNum >= this.magnitude.Length)
+            {
                 return false;
+            }
 
             int word = this.magnitude[this.magnitude.Length - 1 - wordNum];
             return ((word >> (n % 32)) & 1) > 0;
@@ -2940,10 +3106,14 @@ namespace TLSharp.Core.MTProto.Crypto
             BigInteger value)
         {
             if (this.sign == 0)
+            {
                 return value;
+            }
 
             if (value.sign == 0)
+            {
                 return this;
+            }
 
             int[] aMag = this.sign > 0
                 ? this.magnitude
@@ -2998,10 +3168,14 @@ namespace TLSharp.Core.MTProto.Crypto
             BigInteger value)
         {
             if (this.sign == 0)
+            {
                 return value;
+            }
 
             if (value.sign == 0)
+            {
                 return this;
+            }
 
             int[] aMag = this.sign > 0
                 ? this.magnitude
@@ -3057,14 +3231,20 @@ namespace TLSharp.Core.MTProto.Crypto
             int n)
         {
             if (n < 0)
+            {
                 throw new ArithmeticException("Bit address less than zero");
+            }
 
             if (this.TestBit(n))
+            {
                 return this;
+            }
 
             // TODO Handle negative values and zero
             if (this.sign > 0 && n < (this.BitLength - 1))
+            {
                 return this.FlipExistingBit(n);
+            }
 
             return this.Or(One.ShiftLeft(n));
         }
@@ -3073,14 +3253,20 @@ namespace TLSharp.Core.MTProto.Crypto
             int n)
         {
             if (n < 0)
+            {
                 throw new ArithmeticException("Bit address less than zero");
+            }
 
             if (!this.TestBit(n))
+            {
                 return this;
+            }
 
             // TODO Handle negative values
             if (this.sign > 0 && n < (this.BitLength - 1))
+            {
                 return this.FlipExistingBit(n);
+            }
 
             return this.AndNot(One.ShiftLeft(n));
         }
@@ -3089,11 +3275,15 @@ namespace TLSharp.Core.MTProto.Crypto
             int n)
         {
             if (n < 0)
+            {
                 throw new ArithmeticException("Bit address less than zero");
+            }
 
             // TODO Handle negative values and zero
             if (this.sign > 0 && n < (this.BitLength - 1))
+            {
                 return this.FlipExistingBit(n);
+            }
 
             return this.Xor(One.ShiftLeft(n));
         }

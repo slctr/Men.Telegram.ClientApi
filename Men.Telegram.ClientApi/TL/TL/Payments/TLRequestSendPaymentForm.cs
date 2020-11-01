@@ -39,14 +39,22 @@ namespace TeleSharp.TL.Payments
             this.Flags = br.ReadInt32();
             this.MsgId = br.ReadInt32();
             if ((this.Flags & 1) != 0)
+            {
                 this.RequestedInfoId = StringUtil.Deserialize(br);
+            }
             else
+            {
                 this.RequestedInfoId = null;
+            }
 
             if ((this.Flags & 2) != 0)
+            {
                 this.ShippingOptionId = StringUtil.Deserialize(br);
+            }
             else
+            {
                 this.ShippingOptionId = null;
+            }
 
             this.Credentials = (TLAbsInputPaymentCredentials)ObjectUtils.DeserializeObject(br);
 
@@ -59,9 +67,15 @@ namespace TeleSharp.TL.Payments
             bw.Write(this.Flags);
             bw.Write(this.MsgId);
             if ((this.Flags & 1) != 0)
+            {
                 StringUtil.Serialize(this.RequestedInfoId, bw);
+            }
+
             if ((this.Flags & 2) != 0)
+            {
                 StringUtil.Serialize(this.ShippingOptionId, bw);
+            }
+
             ObjectUtils.SerializeObject(this.Credentials, bw);
 
         }

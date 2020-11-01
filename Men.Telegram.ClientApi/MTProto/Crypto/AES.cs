@@ -32,7 +32,7 @@ namespace TLSharp.Core.MTProto.Crypto
         {
             using (SHA1 hash = new SHA1Managed())
             {
-                var nonces = new byte[48];
+                byte[] nonces = new byte[48];
 
                 newNonce.CopyTo(nonces, 0);
                 serverNonce.CopyTo(nonces, 32);
@@ -47,8 +47,8 @@ namespace TLSharp.Core.MTProto.Crypto
                 newNonce.CopyTo(nonces, 32);
                 byte[] hash3 = hash.ComputeHash(nonces);
 
-                using (var keyBuffer = new MemoryStream(32))
-                using (var ivBuffer = new MemoryStream(32))
+                using (MemoryStream keyBuffer = new MemoryStream(32))
+                using (MemoryStream ivBuffer = new MemoryStream(32))
                 {
                     keyBuffer.Write(hash1, 0, hash1.Length);
                     keyBuffer.Write(hash2, 0, 12);
@@ -66,7 +66,7 @@ namespace TLSharp.Core.MTProto.Crypto
         {
             using (SHA1 hash = new SHA1Managed())
             {
-                var nonces = new byte[48];
+                byte[] nonces = new byte[48];
 
                 newNonce.CopyTo(nonces, 0);
                 serverNonce.CopyTo(nonces, 32);
@@ -81,8 +81,8 @@ namespace TLSharp.Core.MTProto.Crypto
                 newNonce.CopyTo(nonces, 32);
                 byte[] hash3 = hash.ComputeHash(nonces);
 
-                using (var keyBuffer = new MemoryStream(32))
-                using (var ivBuffer = new MemoryStream(32))
+                using (MemoryStream keyBuffer = new MemoryStream(32))
+                using (MemoryStream ivBuffer = new MemoryStream(32))
                 {
                     keyBuffer.Write(hash1, 0, hash1.Length);
                     keyBuffer.Write(hash2, 0, 12);
@@ -108,8 +108,8 @@ namespace TLSharp.Core.MTProto.Crypto
 
         public static byte[] DecryptIGE(byte[] ciphertext, byte[] key, byte[] iv)
         {
-            var iv1 = new byte[iv.Length / 2];
-            var iv2 = new byte[iv.Length / 2];
+            byte[] iv1 = new byte[iv.Length / 2];
+            byte[] iv2 = new byte[iv.Length / 2];
 
             Array.Copy(iv, 0, iv1, 0, iv1.Length);
             Array.Copy(iv, iv1.Length, iv2, 0, iv2.Length);
@@ -162,8 +162,8 @@ namespace TLSharp.Core.MTProto.Crypto
                 plaintext = plaintextBuffer.ToArray();
             }
 
-            var iv1 = new byte[iv.Length / 2];
-            var iv2 = new byte[iv.Length / 2];
+            byte[] iv1 = new byte[iv.Length / 2];
+            byte[] iv2 = new byte[iv.Length / 2];
 
             Array.Copy(iv, 0, iv1, 0, iv1.Length);
             Array.Copy(iv, iv1.Length, iv2, 0, iv2.Length);
@@ -211,9 +211,12 @@ namespace TLSharp.Core.MTProto.Crypto
 
         public static byte[] XOR(byte[] buffer1, byte[] buffer2)
         {
-            var result = new byte[buffer1.Length];
+            byte[] result = new byte[buffer1.Length];
             for (int i = 0; i < buffer1.Length; i++)
+            {
                 result[i] = (byte)(buffer1[i] ^ buffer2[i]);
+            }
+
             return result;
         }
 
@@ -492,10 +495,12 @@ namespace TLSharp.Core.MTProto.Crypto
             int t;
 
             if ((KC != 4) && (KC != 6) && (KC != 8))
+            {
                 throw new ArgumentException("Key length not 128/192/256 bits.");
+            }
 
             this.ROUNDS = KC + 6; // This is not always true for the generalized Rijndael that allows larger block sizes
-            var W = new uint[this.ROUNDS + 1, 4]; // 4 words in a block
+            uint[,] W = new uint[this.ROUNDS + 1, 4]; // 4 words in a block
 
             //
             // copy the key into the round key array

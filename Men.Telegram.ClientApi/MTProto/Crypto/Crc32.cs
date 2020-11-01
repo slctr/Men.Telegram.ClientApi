@@ -36,7 +36,9 @@ namespace TLSharp.Core.MTProto.Crypto
         public Crc32(UInt32 polynomial, UInt32 seed)
         {
             if (!BitConverter.IsLittleEndian)
+            {
                 throw new PlatformNotSupportedException("Not supported on Big Endian processors");
+            }
 
             this.table = InitializeTable(polynomial);
             this.seed = this.hash = seed;
@@ -54,7 +56,7 @@ namespace TLSharp.Core.MTProto.Crypto
 
         protected override byte[] HashFinal()
         {
-            var hashBuffer = UInt32ToBigEndianBytes(~this.hash);
+            byte[] hashBuffer = UInt32ToBigEndianBytes(~this.hash);
             this.HashValue = hashBuffer;
             return hashBuffer;
         }
@@ -79,40 +81,56 @@ namespace TLSharp.Core.MTProto.Crypto
         static UInt32[] InitializeTable(UInt32 polynomial)
         {
             if (polynomial == DefaultPolynomial && defaultTable != null)
-                return defaultTable;
-
-            var createTable = new UInt32[256];
-            for (var i = 0; i < 256; i++)
             {
-                var entry = (UInt32)i;
-                for (var j = 0; j < 8; j++)
+                return defaultTable;
+            }
+
+            uint[] createTable = new UInt32[256];
+            for (int i = 0; i < 256; i++)
+            {
+                uint entry = (UInt32)i;
+                for (int j = 0; j < 8; j++)
+                {
                     if ((entry & 1) == 1)
+                    {
                         entry = (entry >> 1) ^ polynomial;
+                    }
                     else
+                    {
                         entry >>= 1;
+                    }
+                }
+
                 createTable[i] = entry;
             }
 
             if (polynomial == DefaultPolynomial)
+            {
                 defaultTable = createTable;
+            }
 
             return createTable;
         }
 
         static UInt32 CalculateHash(UInt32[] table, UInt32 seed, IList<byte> buffer, int start, int size)
         {
-            var hash = seed;
-            for (var i = start; i < start + size; i++)
+            uint hash = seed;
+            for (int i = start; i < start + size; i++)
+            {
                 hash = (hash >> 8) ^ table[buffer[i] ^ hash & 0xff];
+            }
+
             return hash;
         }
 
         static byte[] UInt32ToBigEndianBytes(UInt32 uint32)
         {
-            var result = BitConverter.GetBytes(uint32);
+            byte[] result = BitConverter.GetBytes(uint32);
 
             if (BitConverter.IsLittleEndian)
+            {
                 Array.Reverse(result);
+            }
 
             return result;
         }

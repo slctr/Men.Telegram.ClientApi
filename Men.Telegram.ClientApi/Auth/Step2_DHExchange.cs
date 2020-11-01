@@ -27,7 +27,7 @@ namespace TLSharp.Core.Auth
         {
             new Random().NextBytes(this.newNonce);
 
-            var pqPair = Factorizator.Factorize(pq);
+            FactorizedPair pqPair = Factorizator.Factorize(pq);
 
             byte[] reqDhParamsBytes;
 
